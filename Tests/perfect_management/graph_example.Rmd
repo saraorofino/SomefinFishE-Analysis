@@ -1,0 +1,197 @@
+---
+title: "graph_example"
+author: "Sara Orofino"
+date: "11/25/2019"
+output: html_document
+---
+hi
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(RColorBrewer)
+library(here)
+
+#Read in the perfect management data:
+perfect <- read_csv(file=file.path(here(),"/Tests/perfect_management/csv_results/perfect.csv"))
+```
+
+Example graph to show what the best possible management outcomes could be under a certain climate change velocity and magnitude.
+
+Idea is to choose three r's that may be representative of "slow", "intermediate", and "fast" growing species. I'll use the most aggressive decline in productivity (-0.01767), the lower bound of our climate scenarios, and the "overfished" starting biomass (1500). But these graphs could be replicated for any starting biomass or climate change velocity. I'm picking these two because it represents a worst case scenario within our definition of these parameters.
+
+##Slow 
+Experiment 1
+ - b_0 = 1500
+ - r = 0.1
+ - r_s = -0.01767
+
+With climate change: Perfect management under climate change calculates fmsy based on the life history traits of the species and assumes that fishing mortality in every year is equal to fmsy. 
+```{r slow-filter}
+#Get biomass over time for the experiment we want to graph:
+slow <- perfect %>% 
+  filter(id == 1)
+
+```
+
+First calculate the MSY for the species based on r = 0.1 and K = 10000
+```{r calc-msy}
+#Calculate MSY:
+msy <- function(r, K, p){
+  msy = (r * K) / ((p + 1) ^ ((p + 1)/p))
+  return(msy)
+}
+
+msy_slow <- msy(r = 0.1, K = 10000, p = 0.2)
+
+```
+
+Now filter the experiment 1 results to only keep the r and then calculate a new MSY for every time step. 
+```{r filter}
+#Filter the results to keep only the positive r values
+slow_edit <- slow %>% 
+  select(year, r) %>% 
+  filter(r > 0)
+
+#Create a vector of r values
+r_exp1 <- slow_edit$r
+
+#Calculate MSY for all r values
+df <- data.frame(r = r_exp1, msy_val = rep(NA, 100))
+
+for(i in 1:100){
+  r_calc <- r_exp1[i]
+  df$msy_val[i] <- msy(r = r_calc, K = 10000, p = 0.2)
+}
+
+#Combine the MSY into the dataframe 
+slow_combine <- full_join(slow_edit, df, by = "r")
+```
+
+Graph: Now graph the constant MSY vs. the changing MSY with climate change 
+```{r slow-graph2}
+
+slow_graph2 <- ggplot(slow_combine, aes(x=year, y=msy_val)) +
+  geom_line(aes(color = "Climate")) +
+  geom_hline(aes(yintercept = msy_slow, color = "No Climate")) + 
+  scale_x_continuous(expand = c(0,0), limits = c(0,100.5), breaks = seq(0,100, by = 20)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,350)) + 
+  scale_color_manual(breaks = c("No Climate", "Climate"), values = c("tomato3", "forestgreen")) +
+  labs(colour = "",
+       x = "Year", y = "MSY") +
+  theme_bw() 
+
+slow_graph2
+```
+
+
+##Intermediate
+Experiment 22
+ - b_0 = 1500
+ - r = 0.45
+ - r_s = -0.01767
+
+With climate change: Perfect management under climate change calculates fmsy based on the life history traits of the species and assumes that fishing mortality in every year is equal to fmsy. 
+```{r int-filter}
+#Get biomass over time for the experiment we want to graph:
+intermediate <- perfect %>% 
+  filter(id == 22)
+```
+
+Calculate intremediate msy:
+```{r msy-int}
+msy_int <- msy(r = 0.45, K = 10000, p = 0.2)
+```
+
+Now filter the experiment 22 results to only keep the r and then calculate a new MSY for every time step. 
+```{r int-edit}
+#Filter the results to keep only the positive r values
+int_edit <- intermediate %>% 
+  select(year, r) 
+
+#Create a vector of r values
+r_exp22 <- int_edit$r
+
+#Calculate MSY for all r values
+df <- data.frame(r = r_exp22, msy_val = rep(NA, 100))
+
+for(i in 1:100){
+  r_calc <- r_exp22[i]
+  df$msy_val[i] <- msy(r = r_calc, K = 10000, p = 0.2)
+}
+
+#Combine the MSY into the dataframe 
+int_combine <- full_join(int_edit, df, by = "r")
+```
+
+Graph: Constant MSY vs. the changing MSY with climate change 
+```{r int-graph}
+
+int_graph <- ggplot(int_combine, aes(x=year, y=msy_val)) +
+  geom_line(aes(color = "Climate")) +
+  geom_hline(aes(yintercept = msy_int, color = "No Climate")) + 
+  scale_x_continuous(expand = c(0,0), limits = c(0,100.5), breaks = seq(0,100, by = 20)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,1550), breaks = seq(0,1500, by = 500)) + 
+  scale_color_manual(breaks = c("No Climate", "Climate"), values = c("tomato3", "forestgreen")) +
+  labs(colour = "",
+       x = "Year", y = "MSY") +
+  theme_bw() 
+
+int_graph
+```
+
+
+##Fast
+Experiment 43
+ - b_0 = 1500
+ - r = 0.8
+ - r_s = -0.01767
+
+With climate change: Perfect management under climate change calculates fmsy based on the life history traits of the species and assumes that fishing mortality in every year is equal to fmsy. 
+```{r fast-filter}
+#Get biomass over time for the experiment we want to graph:
+fast <- perfect %>% 
+  filter(id == 43)
+```
+
+Calculate fast msy:
+```{r msy-int}
+msy_fast <- msy(r = 0.8, K = 10000, p = 0.2)
+```
+
+Now filter the experiment 43 results to only keep the r and then calculate a new MSY for every time step. 
+```{r int-edit}
+#Filter the results to keep only the positive r values
+fast_edit <- fast %>% 
+  select(year, r) 
+
+#Create a vector of r values
+r_exp43 <- fast_edit$r
+
+#Calculate MSY for all r values
+df <- data.frame(r = r_exp43, msy_val = rep(NA, 100))
+
+for(i in 1:100){
+  r_calc <- r_exp43[i]
+  df$msy_val[i] <- msy(r = r_calc, K = 10000, p = 0.2)
+}
+
+#Combine the MSY into the dataframe 
+fast_combine <- full_join(fast_edit, df, by = "r")
+```
+
+Graph: Constant MSY vs. the changing MSY with climate change 
+```{r int-graph}
+
+fast_graph <- ggplot(fast_combine, aes(x=year, y=msy_val)) +
+  geom_line(aes(color = "Climate")) +
+  geom_hline(aes(yintercept = msy_fast, color = "No Climate")) + 
+  scale_x_continuous(expand = c(0,0), limits = c(0,100.5), breaks = seq(0,100, by = 20)) +
+  scale_y_continuous(expand = c(0,0), limits = c(0,2800), breaks = seq(0,2500, by = 500)) + 
+  scale_color_manual(breaks = c("No Climate", "Climate"), values = c("tomato3", "forestgreen")) +
+  labs(colour = "",
+       x = "Year", y = "MSY") +
+  theme_bw() 
+
+fast_graph
+```

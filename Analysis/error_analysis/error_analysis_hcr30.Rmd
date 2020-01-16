@@ -16,6 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(here)
 library(RColorBrewer)
+library(kableExtra)
 
 #Data
 err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_hcr30.csv"))
@@ -509,6 +510,11 @@ slow_prop <- add_row(slow_prop, error_0.1 = slow1_badavg, error_0.3 = slow3_bada
 
 #Add row names:
 row.names(slow_prop) = c("constant fmsy", "updating fmsy")
+
+slow_table <- kable(slow_prop, col.names = c("10% Error", "30% Error", "50% Error")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered"))
+
+slow_table
 ```
 
 
@@ -768,6 +774,10 @@ int_prop <- add_row(int_prop, error_0.1 = int1_badavg, error_0.3 = int3_badavg, 
 
 #Add row names:
 row.names(int_prop) = c("constant fmsy", "updating fmsy")
+
+int_table <- kable(int_prop, col.names = c("10% Error", "30% Error", "50% Error")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered"))
+int_table
 ```
 
 
@@ -1020,7 +1030,7 @@ yield_fastc$percent_bad <- c(fast1c_badavg, fast3c_badavg, fast5c_badavg)
 
 Make a formal table:  
 
-```{r int-bad-table, echo=FALSE}
+```{r fast-bad-table, echo=FALSE}
 #Dataframe with the fmsy constant prop bad values:
 fast_prop <- data.frame(error_0.1 = fast1c_badavg, error_0.3 = fast3c_badavg, error_0.5 = fast5c_badavg)
 
@@ -1029,4 +1039,8 @@ fast_prop <- add_row(fast_prop, error_0.1 = fast1_badavg, error_0.3 = fast3_bada
 
 #Add row names:
 row.names(fast_prop) = c("constant fmsy", "updating fmsy")
+
+fast_table <- kable(fast_prop, col.names = c("10% Error", "30% Error", "50% Error")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered"))
+fast_table
 ```

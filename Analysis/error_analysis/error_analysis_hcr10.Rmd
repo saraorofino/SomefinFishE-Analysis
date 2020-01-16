@@ -1,0 +1,790 @@
+---
+title: "error_analysis"
+author: "Sara Orofino"
+date: "12/2/2019"
+output: html_document
+---
+
+#{.tabset}
+
+##Setup
+
+```{r setup, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+#Packages
+library(tidyverse)
+library(here)
+library(RColorBrewer)
+
+#Data
+err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5.csv"))
+err_rep5u_2 <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_.1-.25.csv"))
+err_rep10u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep10.csv"))
+err_rep10u_2 <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep10_.1-.25.csv"))
+
+#Comparision of perfect management data
+perfect <- read_csv(file=file.path(here(),"/tests/perfect_management/csv_results/perfect.csv"))
+perfect_rep5 <- read_csv(file=file.path(here(),"/tests/perfect_management/csv_results/perfect_rep5.csv"))
+perfect_fishe <- read_csv(file=file.path(here(),"/Results/error/perfect_updating_rep5.csv"))
+
+```
+
+
+##Decision Calculation
+ - Filter negative climate change   
+ - Filter for assessment years ONLY  
+ - Group simulations by error percentage  
+ - Count the number of times the model chose a ratio that led the manager to make the wrong decision   
+
+**Rep5 - Updating**  
+Do some basic data wrangling for 5 year intervals where Fmsy updating with climate change:  
+  - Look at all negative climate change scenarios  
+  - Look at ONLY assessments where a decision was actually made (filter out times when the fishery was closed)  
+  - Group by error percentage   
+```{r wrangle-5u-basic, include=FALSE}
+#Assessment years:
+assess_5 <- seq(5,100,5)
+
+#Find the proportion of wrong decisions excluding assessments where the fishery was closed 
+rep5u_no <- err_rep5u %>%
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_5) %>% 
+  filter(decision_made == "yes") %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5u" = n) %>% 
+  spread(key = "correct_decision", value = "count_5u") %>%
+  mutate(total_decisions_made = sum(no + yes)) %>% 
+  mutate(prop_no = no/total_decisions_made)
+
+###### Repeat the process for the error between 0.1 and 0.3:
+rep5u2_no <- err_rep5u_2 %>%
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_5) %>% 
+  filter(decision_made == "yes") %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5u" = n) %>% 
+  spread(key = "correct_decision", value = "count_5u") %>%
+  mutate(total_decisions_made = sum(no + yes)) %>% 
+  mutate(prop_no = no/total_decisions_made)
+
+## Add the 0.1 error to the beginning and the 0.3 error to the end:
+rep5u_combined <- rbind(rep5u2_no, rep5u_no) %>% 
+  filter(error != 0.5) %>% 
+  arrange(error)
+```
+
+
+Now I want to see how many "fails" were included in each error category
+```{r 5u-fails, include=FALSE}
+
+#Find the proportion of yes, no, and fail for each error category
+rep5u_fail <- err_rep5u %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_5) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5u" = n) %>% 
+  spread(key = "correct_decision", value = "count_5u") %>% 
+  mutate(total_decisions = sum(yes + no + fail)) %>% 
+  mutate(prop_fail = fail / total_decisions)
+
+###### Repeat the process for the error between 0.1 and 0.3:
+rep5u2_fail <- err_rep5u_2 %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_5) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5u" = n) %>% 
+  spread(key = "correct_decision", value = "count_5u") %>% 
+  mutate(total_decisions = sum(yes + no + fail)) %>% 
+  mutate(prop_fail = fail / total_decisions)
+
+## Add the 0.1 error to the beginning and the 0.3 error to the end:
+rep5u_combined_fail <- rbind(rep5u2_fail, rep5u_fail) %>% 
+  filter(error != 0.5) %>% 
+  arrange(error)
+```
+
+
+
+**Rep10 - Updating**  
+Data wrangling for 10 year intervals where Fmsy is updating with climate change:
+```{r wrangle-10u-basic, include=FALSE}
+
+#Assessment years:
+assess_10 <- seq(10,100,10)
+
+#Find the proportion of wrong decisions excluding assessments where the fishery was closed 
+rep10u_no <- err_rep10u %>%
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_10) %>% 
+  filter(decision_made == "yes") %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_10u" = n) %>% 
+  spread(key = "correct_decision", value = "count_10u") %>% 
+  mutate(total_decisions_made = sum(no + yes)) %>% 
+  mutate(prop_no = no/total_decisions_made)
+
+
+###### Repeat the process for the error between 0.1 and 0.3:
+rep10u2_no <- err_rep10u_2 %>%
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_10) %>% 
+  filter(decision_made == "yes") %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_10u" = n) %>% 
+  spread(key = "correct_decision", value = "count_10u") %>% 
+  mutate(total_decisions_made = sum(no + yes)) %>% 
+  mutate(prop_no = no/total_decisions_made)
+
+## Add the 0.1 error to the beginning and the 0.3 error to the end:
+rep10u_combined <- rbind(rep10u2_no, rep10u_no) %>% 
+  filter(error != 0.5) %>% 
+  arrange(error)
+```
+
+Now I want to see how many "fails" were included in each error category
+```{r 10u-fails, include=FALSE}
+
+#Find the proportion of yes, no, and fail for each error category
+rep10u_fail <- err_rep10u %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_10) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_10u" = n) %>% 
+  spread(key = "correct_decision", value = "count_10u") %>% 
+  mutate(total_decisions = sum(yes + no + fail)) %>% 
+  mutate(prop_fail = fail / total_decisions)
+
+
+
+###### Repeat the process for the error between 0.1 and 0.3:
+rep10u2_fail <- err_rep10u_2 %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_10) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_10u" = n) %>% 
+  spread(key = "correct_decision", value = "count_10u") %>% 
+  mutate(total_decisions = sum(yes + no + fail)) %>% 
+  mutate(prop_fail = fail / total_decisions)
+
+## Add the 0.1 error to the beginning and the 0.3 error to the end:
+rep10u_combined_fail <- rbind(rep10u2_fail, rep10u_fail) %>% 
+  filter(error != 0.5) %>% 
+  arrange(error)
+```
+
+##Table
+
+**Rep5**  
+Proportion of yes/no/fail for 5 year updating Fmsy at the three different errors:
+```{r rep5-table, echo=FALSE, message=FALSE}
+library(kableExtra)
+
+rep5 <- err_rep5u %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_5) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5u" = n) %>% 
+  spread(key = "correct_decision", value = "count_5u") %>% 
+  mutate(total_assessments = sum(yes + no + fail)) %>% 
+  mutate(decisions_made = sum(yes + no)) %>% 
+  mutate(prop_fail = round(fail / total_assessments, digits = 3)) %>% 
+  mutate(prop_no = round(no / decisions_made, digits = 3)) %>% 
+  mutate(prop_yes = round(yes / decisions_made, digits = 3)) %>% 
+  select(error, total_assessments, fail, prop_fail, decisions_made, yes, prop_yes, no, prop_no)
+
+rep5_table <- kable(rep5, col.names = c("Error", "Number of Assessments", "Fail", "Proportion of Failures", "Number of Decisions Made",
+                                        "Number of Yes", "Proportion of Yes", "Number of No", "Proportion of No")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width = F) %>% 
+  row_spec(0, align = "c", font_size = 10) %>% 
+  row_spec(1, font_size = 10) %>% 
+  row_spec(2, font_size = 10) %>% 
+  row_spec(3, font_size = 10)
+
+rep5_table
+```
+
+Proportion of yes/no/fail for 5 year updating Fmsy at the three errors between 0.1 and 0.3:
+```{r rep5-table2, echo=FALSE}
+rep5_2 <- err_rep5u_2 %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_5) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5u" = n) %>% 
+  spread(key = "correct_decision", value = "count_5u") %>% 
+  mutate(total_assessments = sum(yes + no + fail)) %>% 
+  mutate(decisions_made = sum(yes + no)) %>% 
+  mutate(prop_fail = round(fail / total_assessments, digits = 3)) %>% 
+  mutate(prop_no = round(no / decisions_made, digits = 3)) %>% 
+  mutate(prop_yes = round(yes / decisions_made, digits = 3)) %>% 
+  select(error, total_assessments, fail, prop_fail, decisions_made, yes, prop_yes, no, prop_no)
+
+rep5_table2 <- kable(rep5_2, col.names = c("Error", "Number of Assessments", "Fail", "Proportion of Failures", "Number of Decisions Made",
+                                        "Number of Yes", "Proportion of Yes", "Number of No", "Proportion of No")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width = F) %>% 
+  row_spec(0, align = "c", font_size = 10) %>% 
+  row_spec(1, font_size = 10) %>% 
+  row_spec(2, font_size = 10) %>% 
+  row_spec(3, font_size = 10)
+
+rep5_table2
+```
+**Rep10**  
+
+Proportion of yes/no/fail for 10 year updating Fmsy at the three different errors:
+```{r rep10-table, echo=FALSE}
+rep10 <- err_rep10u %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_10) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_10u" = n) %>% 
+  spread(key = "correct_decision", value = "count_10u") %>% 
+  mutate(total_assessments = sum(yes + no + fail)) %>% 
+  mutate(decisions_made = sum(yes + no)) %>% 
+  mutate(prop_fail = round(fail / total_assessments, digits = 3)) %>% 
+  mutate(prop_no = round(no / decisions_made, digits = 3)) %>% 
+  mutate(prop_yes = round(yes / decisions_made, digits = 3)) %>% 
+  select(error, total_assessments, fail, prop_fail, decisions_made, yes, prop_yes, no, prop_no)
+
+rep10_table <- kable(rep10, col.names = c("Error", "Number of Assessments", "Fail", "Proportion of Failures", "Number of Decisions Made",
+                                        "Number of Yes", "Proportion of Yes", "Number of No", "Proportion of No")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width = F) %>% 
+  row_spec(0, align = "c", font_size = 10) %>% 
+  row_spec(1, font_size = 10) %>% 
+  row_spec(2, font_size = 10) %>% 
+  row_spec(3, font_size = 10)
+
+rep10_table
+```
+Proportion of yes/no/fail for 10 year updating Fmsy at the three different errors between 0.1 and 0.3:
+```{r rep10-table2, echo=FALSE}
+rep10_2 <- err_rep10u_2 %>% 
+  filter(r_s <= 0) %>% 
+  filter(year == 1 | year %in% assess_10) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_10u" = n) %>% 
+  spread(key = "correct_decision", value = "count_10u") %>% 
+  mutate(total_assessments = sum(yes + no + fail)) %>% 
+  mutate(decisions_made = sum(yes + no)) %>% 
+  mutate(prop_fail = round(fail / total_assessments, digits = 3)) %>% 
+  mutate(prop_no = round(no / decisions_made, digits = 3)) %>% 
+  mutate(prop_yes = round(yes / decisions_made, digits = 3)) %>% 
+  select(error, total_assessments, fail, prop_fail, decisions_made, yes, prop_yes, no, prop_no)
+
+rep10_table2 <- kable(rep10_2, col.names = c("Error", "Number of Assessments", "Fail", "Proportion of Failures", "Number of Decisions Made",
+                                        "Number of Yes", "Proportion of Yes", "Number of No", "Proportion of No")) %>% 
+  kable_styling(bootstrap_options = c("striped", "bordered", "condensed"), full_width = F) %>% 
+  row_spec(0, align = "c", font_size = 10) %>% 
+  row_spec(1, font_size = 10) %>% 
+  row_spec(2, font_size = 10) %>% 
+  row_spec(3, font_size = 10)
+
+rep10_table2
+```
+
+
+##Visualizations
+
+Experiment with a few ways of visualizing this data  
+
+**Rep5**  
+
+First try proportion of failures on the y-axis with error categories on the x-axis for updating Fmsy
+```{r rep5-viz1, echo=FALSE}
+#Transform the error into factors for graphing:
+rep5u_no$error <- as.factor(rep5u_no$error)
+rep5u_fail$error <- as.factor(rep5u_fail$error)
+
+#Graph:
+fail5 <- ggplot(rep5u_no, aes(x = error, y= prop_no)) +
+  geom_point(aes(color = "No")) + 
+  geom_point(aes(x = error, y = prop_fail, color = "Fail"), data = rep5u_fail) + 
+  scale_color_manual(breaks = c("No", "Fail"), values = c("midnightblue", "firebrick4")) +
+  scale_y_continuous(limits = c(0,0.81), breaks = seq(0.1,0.8, 0.2)) +
+  labs(x = "Error", y = "Proportion") +
+  guides(color=guide_legend(title=NULL)) +
+  theme_bw() 
+
+fail5
+
+#######Repeat for error between 0.1 and 0.3:
+#Transform the error into factors for graphing:
+rep5u_combined$error <- as.factor(rep5u_combined$error)
+rep5u_combined_fail$error <- as.factor(rep5u_combined_fail$error)
+
+#Graph:
+fail5_2 <- ggplot(rep5u_combined, aes(x = error, y= prop_no)) +
+  geom_point(aes(color = "No"), alpha = 0.4) + 
+  geom_point(aes(x = error, y = prop_fail, color = "Fail"), alpha = 0.4, data = rep5u_combined_fail) + 
+  scale_color_manual(breaks = c("No", "Fail"), values = c("midnightblue", "firebrick4")) +
+  scale_y_continuous(limits = c(0,0.81), breaks = seq(0.1,0.8, 0.2)) +
+  labs(x = "Error", y = "Proportion") +
+  guides(color=guide_legend(title=NULL)) +
+  theme_bw() 
+
+fail5_2
+```
+
+**Rep10**  
+
+First try proportion of failures on the y-axis with error categories on the x-axis for updating Fmsy
+```{r rep10-viz1, echo=FALSE}
+#Transform the error into factors for grpahing:
+rep10u_no$error <- as.factor(rep10u_no$error)
+rep10u_fail$error <- as.factor(rep10u_fail$error)
+
+#Graph:
+fail10 <- ggplot(rep10u_no, aes(x = error, y= prop_no)) +
+  geom_point(aes(color = "No")) + 
+  geom_point(aes(x = error, y = prop_fail, color = "Fail"), data = rep10u_fail) + 
+  scale_color_manual(breaks = c("No", "Fail"), values = c("midnightblue", "firebrick4")) +
+  scale_y_continuous(limits = c(0,0.81), breaks = seq(0.1,0.8, 0.2)) +
+  labs(x = "Error", y = "Proportion") +
+  guides(color=guide_legend(title=NULL)) +
+  theme_bw() 
+
+fail10
+
+#######Repeat for error between 0.1 and 0.3:
+#Transform the error into factors for graphing:
+rep10u_combined$error <- as.factor(rep10u_combined$error)
+rep10u_combined_fail$error <- as.factor(rep10u_combined_fail$error)
+
+
+#Graph:
+fail10_2 <- ggplot(rep10u_combined, aes(x = error, y= prop_no)) +
+  geom_point(aes(color = "No")) + 
+  geom_point(aes(x = error, y = prop_fail, color = "Fail"), data = rep10u_combined_fail) + 
+  scale_color_manual(breaks = c("No", "Fail"), values = c("midnightblue", "firebrick4")) +
+  scale_y_continuous(limits = c(0,0.81), breaks = seq(0.1,0.8, 0.2)) +
+  labs(x = "Error", y = "Proportion") +
+  guides(color=guide_legend(title=NULL)) +
+  theme_bw() 
+
+fail10_2
+```
+
+
+
+##Probability of Collapse
+
+What's the probability the fishery collapses under different amounts of error?  
+
+
+Find how many of the 1224 experiments collapsed. What was the most common year of collapse? The earliest year of collapse? The latest year of collapse? what's the probability of the fishery collapsing at 5 or 10 year intervals if the error range is 0.1-0.5 vs 0.15-0.25?     
+```{r number-collapsed, include=FALSE}
+total_experiments <- 1224
+
+###### Rep 5
+#How many fisheries (aka how many unique Ids) collapsed 
+rep5_collapsed <- err_rep5u %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally() #this is column (n) is the number of "fail" per ID - ex: 96 means it failed in year 4 and had 96/100 years recorded as fail
+
+collapse_rep5 <- nrow(rep5_collapsed) #Number of experiments (unique ids) that collapsed - 538 
+
+#Find the most common number of years collapsed:
+# R doesn't have a function for finding the mode so you have to create one
+getmode <- function(x) {
+   uniqx <- unique(x)
+   uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+
+rep5_mode <- getmode(x = rep5_collapsed$n) #most common number of years failed (year of failure = 100 - rep5_mode)
+rep5_max <- min(rep5_collapsed$n) #smallest number of years failed will be the fishery that collapsed latest (year of collapse = 100 - rep5_max)
+rep5_min <- max(rep5_collapsed$n) #largest number of years failed will be fishery that collapsed the earliest (year of collapse = 100 - rep5_min)
+
+rep5_prob <- collapse_rep5 / total_experiments #Probability of collapse
+
+##Repeat for error between 0.1 and 0.3:
+rep5_collapsed2 <- err_rep5u_2 %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+
+collapse2_rep5 <- nrow(rep5_collapsed2)
+
+rep5_mode2 <- getmode(x = rep5_collapsed2$n) 
+rep5_max2 <- min(rep5_collapsed2$n) 
+rep5_min2 <- max(rep5_collapsed2$n) 
+
+rep5_prob2 <- collapse2_rep5 / total_experiments
+
+
+
+###### Rep 10 
+rep10_collapsed <- err_rep10u %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+
+collapse_rep10 <- nrow(rep10_collapsed)
+rep10_mode <- getmode(x = rep10_collapsed$n)
+rep10_max <- min(rep10_collapsed$n)
+rep10_min <- max(rep10_collapsed$n)
+
+rep10_prob <- collapse_rep10 / total_experiments
+
+##Repeat for error between 0.1 and 0.3:
+rep10_collapsed2 <- err_rep10u_2 %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+
+collapse2_rep10 <- nrow(rep10_collapsed2)
+
+rep10_mode2 <- getmode(x = rep10_collapsed2$n) 
+rep10_max2 <- min(rep10_collapsed2$n) 
+rep10_min2 <- max(rep10_collapsed2$n) 
+
+rep10_prob2 <- collapse2_rep10 / total_experiments
+```
+
+
+**Rep5**  
+In the first experiment (error 0.1, 0.3, 0.5) 538 fisheries collapsed    
+ - Most common year of collapse = 4  
+ - Minimum = Year 4  
+ - Maximum = Year 99   
+
+Probability of collapse = 43.95%   
+
+Looking at the error between 0.1 and 0.3 only 331 fisheries collapsed  
+ - Most common year of collapse = 4    
+ - Minimum = Year 4    
+ - Maximum = Year 99     
+
+Probability of collapse = 27.04% 
+
+
+**Rep10**  
+In the first experiment (error 0.1, 0.3, 0.5) 503 fisheries collapsed     
+ - Most common year of collapse = 9   
+ - Minimum = Year 9  
+ - Maximum = Year 99   
+
+Probability of collapse = 41.09%  
+
+Looking at the error between 0.1 and 0.3 only 376 fisheries collapsed   
+ - Most common year of collapse = 9  
+ - Minimum = Year 9  
+ - Maximum = Year 99   
+
+Probability of collapse = 30.72%     
+  
+
+For both 5 and 10 year intervals  the most common year of fishery collapse was the year before the next assessment   
+
+
+
+Now we want a little more detail about the collapsed fisheries. First, how many fisheries collapsed at a 0.5 error vs 0.3 error vs. 0.1 error? 
+```{r collapse-at-error}
+total_experiments <- 1224
+
+###### Rep 5
+##Now look at the probability of failure at each of the three error points (0.1,0.3,0.5) and compare:
+#0.1 Error
+rep5_1 <- err_rep5u %>% 
+  filter(error == 0.1) %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+collapse0.1_rep5 <- nrow(rep5_1)
+rep5_0.1prob <- collapse0.1_rep5 / total_experiments
+#0.3 Error
+rep5_3 <- err_rep5u %>% 
+  filter(error == 0.3) %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+collapse0.3_rep5 <- nrow(rep5_3)
+rep5_0.3prob <- collapse0.3_rep5 / total_experiments
+#0.5 Error
+rep5_5 <- err_rep5u %>% 
+  filter(error == 0.5) %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+collapse0.5_rep5 <- nrow(rep5_5)
+rep5_0.5prob <- collapse0.5_rep5 / total_experiments
+
+###### Rep 10
+##Now look at the probability of failure at each of the three error points (0.1,0.3,0.5) and compare:
+#0.1 Error
+rep10_1 <- err_rep10u %>% 
+  filter(error == 0.1) %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+collapse0.1_rep10 <- nrow(rep10_1)
+rep10_0.1prob <- collapse0.1_rep10 / total_experiments
+#0.3 Error
+rep10_3 <- err_rep10u %>% 
+  filter(error == 0.3) %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+collapse0.3_rep10 <- nrow(rep10_3)
+rep10_0.3prob <- collapse0.3_rep10 / total_experiments
+#0.5 Error
+rep10_5 <- err_rep10u %>% 
+  filter(error == 0.5) %>% 
+  filter(decision_made == "no") %>% 
+  group_by(id) %>% 
+  tally()
+collapse0.5_rep10 <- nrow(rep10_5)
+rep10_0.5prob <- collapse0.5_rep10 / total_experiments
+```
+
+
+**Rep5**  
+Probability of collapse at different errors:  
+  - 0.1: 4.82%   
+  - 0.3: 15.11%  
+  - 0.5: 24.02%  
+
+**Rep10**  
+Probability of collapse at different errors:  
+  - 0.1: 6.54%   
+  - 0.3: 14.62%  
+  - 0.5: 19.93% 
+  
+Are those differences significant?   
+Use a chi square test to test for significant association in proportions  
+Is there a significant effect of error on fisheries collapse?
+H0: There is no significant effect of error on fisheries collapse (proportions are similar regardless of error)
+HA: There is a significant effect of error on fisheries collapse (proportions are significantly different at different errors)
+```{r chi-square-error}
+### Rep 5
+#First we need to get just the counts of the different errors together in one dataframe:
+one <- collapse0.1_rep5
+three <- collapse0.3_rep5
+five <- collapse0.5_rep5
+rep5_counts <- data.frame(one, three, five)
+
+#chi-square test
+rep5_chi <- chisq.test(rep5_counts)
+rep5_chi
+## I'm not really sure about this set up. I only wanted to test if there was a significant association between the number of failures and the amount of error but I feel like I'm missing something...
+```
+
+
+How many fisheries collapsed if the starting biomass was 1500 vs 6000? How many fisheries collapsed at different magnitudes of climate change? How many of the collapsed fisheries had slow vs. fast growth rates?  
+
+##Cumulative Yield
+
+###Slow Growing
+Initial Conditions of Experiment:
+  - b0 = 4000
+  - r = 0.2 
+  - r_s = -0.01767
+  - error = 0.1
+
+Perfect Management: ID = 8
+Perfect given FISHE: ID = 5
+Error: ID = 5, 413, 821
+```{r error}
+#Find an error simulation at climate of -0.01767 that doesn't collapse
+err <- err_rep5u %>% 
+  filter(r_s == -0.01767) %>% 
+  filter(c != 0) %>% 
+  filter(r_0 == 0.2)
+#Use experiment 5 
+
+#Find the experiment with same r0 and r_s for 0.3 error and 0.5 error 
+err_3 <- err_rep5u %>% 
+  filter(r_s == -0.01767) %>% 
+  filter(r_0 == 0.2) %>% 
+  filter(error == 0.3)
+#413
+err_5 <- err_rep5u %>% 
+  filter(r_s == -0.01767) %>% 
+  filter(r_0 == 0.2) %>% 
+  filter(error == 0.5)
+#821
+```
+
+
+```{r cumulative-yield-slow, include=FALSE}
+
+#Calculate cumulative yield under perfect management
+perfect_slow <- perfect %>% 
+  filter(id == 8)
+
+yield_perfect_slow = sum(perfect_slow$c)
+
+#Calculate cumulative yield under perfect management given FISHE
+fishe_slow <- perfect_fishe %>% 
+  filter(id == 5)
+
+yield_fishe_slow = sum(fishe_slow$c)
+
+#Calculate cumulative yield in error simulations:
+error1_slow <- err_rep5u %>% 
+  filter(id == 5) 
+error3_slow <- err_rep5u %>% 
+  filter(id == 413) %>% 
+  filter(year < 36)
+error5_slow <- err_rep5u %>% 
+  filter(id == 821) %>% 
+  filter(year < 26)
+
+yield_error1_slow = sum(error1_slow$c)
+yield_error3_slow = sum(error3_slow$c)
+yield_error5_slow = sum(error5_slow$c)
+
+```
+
+
+So perfect management with FISHE has slightly higher absolute yields than perfect management... but the biomass at perfect management is basically stablized around 4018 and the FISHE biomass is still declining around 3600 so maybe that kind of makes sense
+
+Graph biomass and catch over time for perfect management, perfect given FISHE, and the error simulation:
+```{r biomass-graphs-slow, echo=FALSE, warning=FALSE}
+
+#Biomass over time:
+biomass_slow <- ggplot(perfect_slow, aes(x=year, y=b)) + 
+  geom_line(aes(color = "a")) + 
+  geom_line(data = fishe_slow, aes(x=year, y=b, color = "b")) +
+  geom_line(data =error1_slow, aes(x=year, y=b, color = "c")) +
+  geom_line(data =error3_slow, aes(x=year, y=b, color = "d")) +
+  geom_line(data =error5_slow, aes(x=year, y=b, color = "e")) +  
+  scale_color_manual(name = '', breaks = c("a","b", "c", "d", "e"), values = c('darkgreen', 'navy','firebrick4', 'firebrick4','firebrick4'),
+                     labels = c("Perfect Management", "Perfect with FISHE", "FISHE with 10% Error", "FISHE with 30% Error",
+                                "FISHE with 50% Error")) +
+  scale_y_continuous(expand = c(0,0), limits = c(3000,4150), breaks = seq(3000,4100,200)) +
+  scale_x_continuous(expand = c(0,0.5)) + 
+  labs(x = "Year", y = "Biomass") +
+  theme_bw()
+
+biomass_slow
+
+#Catch over time:
+catch_slow <- ggplot(perfect_slow, aes(x=year, y=c)) + 
+  geom_line(aes(color = "a")) +
+  geom_line(data=fishe_slow, aes(x=year, y=c, color = "b")) +
+  geom_line(data=error1_slow, aes(x=year, y=c, color = "c")) +
+  geom_line(data =error3_slow, aes(x=year, y=c, color = "d")) +
+  geom_line(data =error5_slow, aes(x=year, y=c, color = "e")) +  
+  scale_color_manual(name = '', breaks = c("a","b", "c", "d", "e"), values = c('darkgreen', 'navy','firebrick4', 'firebrick4', 'firebrick4'),
+                     labels = c("Perfect Management", "Perfect with FISHE", "FISHE with 10% Error", "FISHE with 30% Error",
+                                "FISHE with 50% Error")) +
+  scale_y_continuous(expand = c(0,0), limits = c(100,705), breaks = seq(100,700,100)) +
+  scale_x_continuous(expand = c(0,0.5)) + 
+  labs(x = "Year", y = "Catch") + 
+  theme_bw()
+
+catch_slow
+
+```
+
+###Fast Growing
+Initial Conditions of Experiment:
+  - b0 = 4000
+  - r = 0.8
+  - r_s = -0.01767
+  - error = 0.1
+  
+Perfect Management: ID = 44
+Perfect given FISHE: ID = 23
+Error: ID = 23, 
+```{r error-fast}
+#Find the right error experiment to use
+err_fast <- err_rep5u %>% 
+  filter(r_s == -0.01767) %>% 
+  filter(r_0 == 0.8)
+#Use experiment 23
+
+#Find the experiment with same r0 and r_s for 0.3 error and 0.5 error 
+err_3f <- err_rep5u %>% 
+  filter(r_s == -0.01767) %>% 
+  filter(r_0 == 0.8) %>% 
+  filter(error == 0.3)
+#431
+err_5f <- err_rep5u %>% 
+  filter(r_s == -0.01767) %>% 
+  filter(r_0 == 0.8) %>% 
+  filter(error == 0.5)
+#839
+```
+
+
+```{r cumulative-yield-fast, include=FALSE}
+
+#Calculate cumulative yield under perfect management
+perfect_fast <- perfect %>% 
+  filter(id == 44)
+
+yield_perfect_fast = sum(perfect_fast$c)
+
+#Calculate cumulative yield under perfect management given FISHE
+fishe_fast <- perfect_fishe %>% 
+  filter(id == 23)
+
+yield_fishe_fast = sum(fishe_fast$c)
+
+#Calculate cumulative yield in error simulation
+error1_fast <- err_rep5u %>% 
+  filter(id == 23)
+error3_fast <- err_rep5u %>% 
+  filter(id == 431) %>% 
+  filter(year < 21)
+error5_fast <- err_rep5u %>% 
+  filter(id == 839) %>% 
+  filter(year < 76)
+
+yield_error_fast1 = sum(error1_fast$c)
+yield_error_fast3 = sum(error3_fast$c)
+yield_error_fast5 = sum(error5_fast$c)
+
+```
+
+
+Graph biomass and catch over time for perfect management, perfect given FISHE, and the error simulation:
+```{r biomass-graphs-fast, echo=FALSE, warning=FALSE}
+
+#Biomass over time:
+biomass_fast <- ggplot(perfect_fast, aes(x=year, y=b)) + 
+  geom_line(aes(color = "a")) + 
+  geom_line(data = fishe_fast, aes(x=year, y=b, color = "b")) +
+  geom_line(data =error1_fast, aes(x=year, y=b, color = "c")) +
+  geom_line(data =error3_fast, aes(x=year, y=b, color = "d")) +
+  geom_line(data =error5_fast, aes(x=year, y=b, color = "e")) +
+  scale_color_manual(name = '', breaks = c("a","b", "c", "d", "e"), values = c('darkgreen', 'navy','firebrick4', 'firebrick4', 'firebrick4'),
+                     labels = c("Perfect Management", "Perfect with FISHE", "FISHE with 10% Error", "FISHE with 30% Error", "FISHE with 50% Error")) +
+  scale_y_continuous(expand = c(0,0), limits = c(2300,4350), breaks = seq(2500,4100,500)) +
+  scale_x_continuous(expand = c(0,0.5)) + 
+  labs(x = "Year", y = "Biomass") +
+  theme_bw()
+
+biomass_fast
+
+#Catch over time:
+catch_fast <- ggplot(perfect_fast, aes(x=year, y=c)) + 
+  geom_line(aes(color = "a")) +
+  geom_line(data=fishe_fast, aes(x=year, y=c, color = "b")) +
+  geom_line(data=error1_fast, aes(x=year, y=c, color = "c")) +
+  geom_line(data=error3_fast, aes(x=year, y=c, color = "d")) +
+  geom_line(data=error5_fast, aes(x=year, y=c, color = "e")) +
+  scale_color_manual(name = '', breaks = c("a","b", "c", "d", "e"), values = c('darkgreen', 'navy','firebrick4', 'firebrick4', 'firebrick4'),
+                     labels = c("Perfect Management", "Perfect with FISHE", "FISHE with 10% Error", "FISHE with 30% Error", "FISHE with 50% Error")) +
+  scale_y_continuous(expand = c(0,0), limits = c(430,3000), breaks = seq(500,3000,500)) +
+  scale_x_continuous(expand = c(0,0.5)) + 
+  labs(x = "Year", y = "Catch") + 
+  theme_bw()
+
+catch_fast
+
+```

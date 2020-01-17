@@ -1,0 +1,74 @@
+---
+title: "error_finalviz"
+output: html_document
+---
+
+#{.tabset}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+
+#Packages
+library(tidyverse)
+library(here)
+library(RColorBrewer)
+
+#Data
+err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_hcr30.csv"))
+err_rep10u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep10_hcr30.csv"))
+err_rep5c <- read_csv(file=file.path(here(),"/Results/error/error_constant_rep5_hcr30.csv"))
+err_rep10c <- read_csv(file=file.path(here(),"/Results/error/error_constant_rep10_hcr30.csv"))
+
+
+#Comparision of perfect management data
+perfect <- read_csv(file=file.path(here(),"/Tests/perfect_management/csv_results/perfect_r0.1.csv"))
+perfect_fishe <- read_csv(file=file.path(here(),"/Results/error/perfect_updating_rep5_hcr30.csv"))
+
+```
+
+
+##Constant Fmsy
+
+Create a bar graph of the proportion of bad outcomes (wrong decisions) on the y-axis for the different levels of error  
+
+Steps:  
+  - Wrangle data to only include assessment years and observations where a decision was actually made  
+  - Group by "yes" or "no" for different error levels  
+  - Calculate the proportion of bad outcomes (when you did not make the correct decision)  
+```{r wrangle-constant, include=FALSE}
+#Assessment years:
+assess_5 <- seq(5,100,5)
+
+prop_bad_c <- err_rep5c %>%
+  filter(year == 1 | year %in% assess_5) %>% 
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5c" = n) %>% 
+  spread(key = "correct_decision", value = "count_5c") %>% 
+  mutate(decisions_made = sum(yes + no)) %>% 
+  mutate(total_assessments = sum(yes + no + fail)) %>% 
+  mutate(prop_wrong = no / decisions_made) %>% 
+  mutate(prop_closed = fail / total_assessments) %>% 
+  mutate(prop_bad = (no + fail) / total_assessments)
+```
+
+```{r constant-graphs, echo=FALSE}
+#Want to have error as a factor so that the graphs have a discrete x-axis:
+prop_bad_c$error <- as.factor(prop_bad_c$error)
+
+#Graph with the prop wrong decisions on the y:
+prop_wrong_c <- ggplot(prop_bad_c, aes(x = error, y = prop_wrong)) + 
+  geom_col()
+prop_wrong_c
+
+#Graph with prop closed on the y:
+prop_closed_c <- ggplot(prop_bad_c, aes(x = error, y = prop_closed)) +
+  geom_col()
+prop_closed_c
+
+#Graph both to show the correlation:
+prop_both_c <- ggplot(prop_bad_c) + 
+  geom_col(aes(x = error, y = prop_wrong)) + 
+  geom_col(aes(x = error, y = prop_closed))
+prop_both_c
+##This only combines the two into one column, you need a different type of data frame to graph side by side. You would need a column called frequency that had the proportion and then a column called outcome which said if the proportion was wrong or closed. Use x=error, y=frequency, fill=outcome, position="dodge"
+```
+

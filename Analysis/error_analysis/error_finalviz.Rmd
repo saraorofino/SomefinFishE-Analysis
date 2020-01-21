@@ -27,8 +27,7 @@ perfect_fishe <- read_csv(file=file.path(here(),"/Results/error/perfect_updating
 
 ##Constant Fmsy
 
-Create a bar graph of the proportion of fisheries closed in year 100 on the y-axis for the different levels of error  
-
+Going to try understanding the break down of wrong decisions to look for interesting patterns:  
 
 Steps:  
   - Create a column to track actions using the following criteria:  
@@ -40,7 +39,9 @@ Steps:
       - If the fishery is closed (no decision was made) --> closed
   - Wrangle data to only include assessment years    
   - Group by actions at different error levels   
-  - Calculate the proportion of different outcomes    
+  - Calculate the proportion of different outcomes 
+  
+NOTE: Will not use this for final graphs - see next code chunk  
 ```{r wrangle-constant, include=FALSE}
 
 #Add column to track if specific actions resulting from different decisions:  
@@ -86,8 +87,10 @@ prop_bad_c <- rep5c_edit %>%
 
 ```
 
+This time use Chase's method of Year 100 overfished, good, closed. Proportion of bad outcomes is closed + overfished  
 
-```{r year100, include=FALSE}
+Use this code chunk for final graph!
+```{r year100-constant, include=FALSE}
 ##Looking at outcomes only in year 100 
 #First find proportion of bad outcomes in year 100 (fisheries closed + overfished)
 prop_100_c <- rep5c_edit %>% 
@@ -129,7 +132,7 @@ For Test 4 we need to have a bar graph of proportion of bad outcomes for constan
 
 First, wrangle data using the open, closed, overfished in year 100 and then graph both  
 
-```{r wrangle-updating, include=FALSE}
+```{r year100-updating, include=FALSE}
 prop_100_u <- err_rep5u %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 

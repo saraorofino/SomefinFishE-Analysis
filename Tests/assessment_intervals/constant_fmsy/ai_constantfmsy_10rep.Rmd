@@ -26,7 +26,7 @@ In this experiment, the true Fmsy is adjusting over time as climate change alter
 
 The error in the F/Fmsy ratio is .3.
 
-The test will cover a range of climate impacts, initial growth rates, and initial biomasses, with a 10% reduction hcr.
+The test will cover a range of climate impacts, initial growth rates, and initial biomasses, with a 30% reduction hcr.
 
 Assumptions: 
  - Fisheries represented in the model have no current management. Initial biomass in the simulation is therefore representative of the equilibrium that the fishery has reached over the years due to some level of fishing mortality (f). 
@@ -188,7 +188,7 @@ list_ai <- list(
   p = 0.2,
   k = 10000,
   years = 100,
-  hcr = .9
+  hcr = .7
 )
 
 input_ai <- list_ai %>%
@@ -230,11 +230,11 @@ results_id <- list()
 for(i in 1:408){
   dat <- as.data.frame(matrix(unlist(results[i]), ncol = 9))
   dat$id <- i
-  dat$r_0 <- rep(input_hcr[[i]]$r, 100)
-  dat$err <- rep(input_hcr[[i]]$error, 100)
-  dat$r_s <- rep(input_hcr[[i]]$r_s, 100)
-  dat$hcr <- rep(input_hcr[[i]]$hcr, 100)
-  dat$b_0 <- rep(input_hcr[[i]]$b, 100)
+  dat$r_0 <- rep(input_ai[[i]]$r, 100)
+  dat$err <- rep(input_ai[[i]]$error, 100)
+  dat$r_s <- rep(input_ai[[i]]$r_s, 100)
+  dat$hcr <- rep(input_ai[[i]]$hcr, 100)
+  dat$b_0 <- rep(input_ai[[i]]$b, 100)
   results_id[[i]] <- dat
 }
 #Bind all the experiments together
@@ -245,7 +245,7 @@ colnames(results_ai) <- col_names
 
 #Write as CSV:
 # library(here)
-#  write.csv(results_ai, file=file.path(here(),"/Results/assessment_intervals/ai_constantyfmsy_10rep.csv"),
+#  write.csv(results_ai, file=file.path(here(),"Results/assessment_intervals/ai_constantfmsy_10rep_hcr30.csv"),
 #            row.names = FALSE)
 
 ```

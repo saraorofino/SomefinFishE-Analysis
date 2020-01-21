@@ -1,0 +1,34 @@
+---
+title: "assessment_finalviz"
+output: html_document
+---
+
+#{.tabset}
+```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+
+#Packages
+library(tidyverse)
+library(here)
+library(RColorBrewer)
+
+#Data
+rep0c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai__constantyfmsy_0rep.csv"))
+rep5c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_5rep.csv"))
+rep10c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_10rep.csv"))
+rep15c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_15rep.csv"))
+rep20c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_20rep.csv"))
+
+rep0u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_0rep.csv"))
+rep5u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_5rep.csv"))
+rep10u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_10rep.csv"))
+rep15u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_15rep.csv"))
+rep20u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_20rep.csv"))
+
+
+```
+
+
+##Constant Fmsy
+
+Create a bar graph of the proportion of bad outcomes (overfished + closed) in year 100 at the different assessment intervals  
+

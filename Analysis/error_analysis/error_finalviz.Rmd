@@ -27,48 +27,91 @@ perfect_fishe <- read_csv(file=file.path(here(),"/Results/error/perfect_updating
 
 ##Constant Fmsy
 
-Create a bar graph of the proportion of bad outcomes (wrong decisions) on the y-axis for the different levels of error  
+Create a bar graph of the proportion of fisheries closed in year 100 on the y-axis for the different levels of error  
+
 
 Steps:  
-  - Wrangle data to only include assessment years and observations where a decision was actually made  
-  - Group by "yes" or "no" for different error levels  
-  - Calculate the proportion of bad outcomes (when you did not make the correct decision)  
+  - Create a column to track actions using the following criteria:  
+      - If the manager made the correct decision --> correct 
+      - If the manager made the wrong decision and should have cutback but increased fishing instead --> cutback  
+      - If the manager made the wrong decision and should have closed the fishery but didn't --> closed  
+      - If the manager made the wrong decision and closed the fishery but shouldn't have --> false_close  
+      - If the manager made the wrong decision and cutback but could have increased fishing --> increase
+  - Wrangle data to only include assessment years    
+  - Group by actions at different error levels   
+  - Calculate the proportion of different outcomes    
 ```{r wrangle-constant, include=FALSE}
+
+#Add column to track if specific actions resulting from different decisions:  
+rep5c_edit <- err_rep5c %>% 
+  mutate(action = ifelse(correct_decision == "no" & ratio_cat == 2 & ratio_err_cat == 1, "cutback", 
+                          ifelse(correct_decision == "no" & ratio_cat == 3, "closed", 
+                                 ifelse(correct_decision == "no" & ratio_cat == 2 & ratio_err_cat == 3, "false_close",
+                                        ifelse(correct_decision == "no" & ratio_cat == 1, "increase", "correct")))))
+
 #Assessment years:
 assess_5 <- seq(5,100,5)
 
-prop_bad_c <- err_rep5c %>%
+#Group based on action and error:
+prop_actions_c <- rep5c_edit %>%
   filter(year == 1 | year %in% assess_5) %>% 
+  group_by(error, action) %>% 
+  tally() %>% 
+  rename("count_5c" = n) %>% 
+  spread(key = "action", value = "count_5c")
+
+
+
+
+
+```
+
+
+```{r year100, include=FALSE}
+##Looking at outcomes only in year 100 
+#First find proportion of fisheries that were closed by year 100
+prop_100_c <- err_rep5c %>% 
+  filter(year == 100) %>% 
+  group_by(error, decision_made) %>% 
+  tally() %>% 
+  rename("count_5c" = n) %>% 
+  spread(key = "decision_made", value = "count_5c") %>% 
+  mutate(simulations = sum(no + yes)) %>% 
+  mutate(prop_closed = no / simulations)
+
+#Calculate the proportion of wrong decisions in year 100 (decision was made but not the right one)
+prop_100_wrong <- err_rep5c %>% 
+  filter(year == 100) %>% 
   group_by(error, correct_decision) %>% 
   tally() %>% 
   rename("count_5c" = n) %>% 
   spread(key = "correct_decision", value = "count_5c") %>% 
-  mutate(decisions_made = sum(yes + no)) %>% 
-  mutate(total_assessments = sum(yes + no + fail)) %>% 
-  mutate(prop_wrong = no / decisions_made) %>% 
-  mutate(prop_closed = fail / total_assessments) %>% 
-  mutate(prop_bad = (no + fail) / total_assessments)
+  mutate(simulations = sum(no + yes + fail)) %>% 
+  mutate(prop_wrong = no / simulations)
 ```
+
 
 ```{r constant-graphs, echo=FALSE}
 #Want to have error as a factor so that the graphs have a discrete x-axis:
 prop_bad_c$error <- as.factor(prop_bad_c$error)
+prop_100_c$error <- as.factor(prop_100_c$error)
 
-#Graph with the prop wrong decisions on the y:
+#Graph with the prop wrong decisions (you made a decision but not the right one) on the y:
 prop_wrong_c <- ggplot(prop_bad_c, aes(x = error, y = prop_wrong)) + 
   geom_col()
 prop_wrong_c
 
-#Graph with prop closed on the y:
+#Graph with prop closed (no decision was made) on the y:
 prop_closed_c <- ggplot(prop_bad_c, aes(x = error, y = prop_closed)) +
   geom_col()
 prop_closed_c
 
-#Graph both to show the correlation:
-prop_both_c <- ggplot(prop_bad_c) + 
-  geom_col(aes(x = error, y = prop_wrong)) + 
-  geom_col(aes(x = error, y = prop_closed))
-prop_both_c
-##This only combines the two into one column, you need a different type of data frame to graph side by side. You would need a column called frequency that had the proportion and then a column called outcome which said if the proportion was wrong or closed. Use x=error, y=frequency, fill=outcome, position="dodge"
+
+##Need a different type of data frame to graph side by side. You would need a column called frequency that had the proportion and then a column called outcome which said if the proportion was wrong or closed. Use x=error, y=frequency, fill=outcome, position="dodge"
+
+#Graph with prop closed in year 100 (out of the 408 simulations for each error bucket how many were closed in year 100) on y axis:
+prop_closed100_c <- ggplot(prop_100_c, aes(x = error, y = prop_closed)) + 
+  geom_col()
+prop_closed100_c
 ```
 

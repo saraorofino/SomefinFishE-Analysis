@@ -4,7 +4,7 @@ output: html_document
 ---
 
 #{.tabset}
-```{r setup, include=FALSE, warning=FALSE, message=FALSE}
+```{r setup, include=FALSE}
 
 #Packages
 library(tidyverse)
@@ -12,17 +12,17 @@ library(here)
 library(RColorBrewer)
 
 #Data
-rep0c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai__constantyfmsy_0rep.csv"))
-rep5c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_5rep.csv"))
-rep10c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_10rep.csv"))
-rep15c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_15rep.csv"))
-rep20c <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__constantyfmsy_20rep.csv"))
+rep0c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai_constantfmsy_0rep_hcr30.csv"))
+rep5c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai_constantfmsy_5rep_hcr30.csv"))
+rep10c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai_constantfmsy_10rep_hcr30.csv"))
+rep15c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai_constantfmsy_15rep_hcr30.csv"))
+rep20c <- read_csv(file=file.path(here(),"/Results/assessment_intervals/ai_constantfmsy_20rep_hcr30.csv"))
 
-rep0u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_0rep.csv"))
-rep5u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_5rep.csv"))
-rep10u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_10rep.csv"))
-rep15u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_15rep.csv"))
-rep20u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updatingfmsy_20rep.csv"))
+rep0u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai_updatingfmsy_0rep_hcr30.csv"))
+rep5u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai_updatingfmsy_5rep_hcr30.csv"))
+rep10u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai_updatingfmsy_10rep_hcr30.csv"))
+rep15u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai_updatingfmsy_15rep_hcr30.csv"))
+rep20u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai_updatingfmsy_20rep_hcr30.csv"))
 
 
 ```
@@ -30,5 +30,184 @@ rep20u <- read_csv(file=file.path(here(),"Results/assessment_intervals/ai__updat
 
 ##Constant Fmsy
 
-Create a bar graph of the proportion of bad outcomes (overfished + closed) in year 100 at the different assessment intervals  
+Create a bar graph of the proportion of bad outcomes (overfished + closed) in year 100 at the different assessment intervals    
+
+Steps:  
+  - For each assessment interval mutate a column for over, good, and closed  
+  - Filter for year 100  
+  - Calculate the proportion of bad outcomes (closed + over)  
+  - Create a graphing df of the proportion of bad outcomes for the different assessment intervals  
+  
+```{r wrangle-assessment-constant, include = FALSE}
+##Rep 0:
+bad0_c <- rep0c %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+##Rep 5:
+bad5_c <- rep5c %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations =  sum(closed + good + over + 3)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+##Rep10:
+bad10_c <- rep10c %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over + 1)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+
+##Rep15:
+bad15_c <- rep15c %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over + 1)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+
+##Rep20:
+bad20_c <- rep20c %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over + 2)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+
+###Combine for graphing:
+intervals <- c(5,10,15,20,"Never") #create the assessment interval column
+prop <- c(bad5_c$prop_bad, bad10_c$prop_bad, bad15_c$prop_bad, bad20_c$prop_bad, bad0_c$prop_bad)
+
+
+graph_c <- data.frame(assessment_intervals = intervals, productivity = rep("Constant", 5), prop_bad = prop)
+
+```
+
+
+Create the graph with prop_bad on y-axis and assessment intervals on the x-axis  
+
+```{r assessment-constant-graph, echo=FALSE}
+#Make sure the assessment intervals is a factor for graphing:
+graph_c$assessment_intervals <- as.factor(graph_c$assessment_intervals)
+
+prop_bad_c <- ggplot(graph_df, aes(x=assessment_intervals, y=prop_bad)) + 
+  geom_col()
+prop_bad_c
+```
+
+##Constant vs. Updating Fmsy
+
+Graph proportion of bad outcomes (overfished + closed) for constant vs. updating fmsy at the different assessment intervals  
+
+```{r wrangle-assessment-updating, include=FALSE}
+##Rep 0:
+bad0_u <- rep0u %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+##Rep 5:
+bad5_u <- rep5u %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations =  sum(closed + good + 1)) %>% 
+  mutate(prop_bad = closed / simulations)
+
+##Rep10:
+bad10_u <- rep10u %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over + 2)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+
+##Rep15:
+bad15_u <- rep15u %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + 1)) %>% 
+  mutate(prop_bad = closed / simulations)
+
+
+##Rep20:
+bad20_u <- rep20u %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  filter(year == 100) %>% 
+  group_by(status) %>% 
+  tally() %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over + 2)) %>% 
+  mutate(prop_bad = sum(closed + over) / simulations)
+
+
+###Combine updating props for graphing:
+intervals <- c(5,10,15,20,"Never") #create the assessment interval column
+prop_u <- c(bad5_u$prop_bad, bad10_u$prop_bad, bad15_u$prop_bad, bad20_u$prop_bad, bad0_u$prop_bad)
+
+
+graph_u <- data.frame(assessment_intervals = intervals, productivity = rep("Updating", 5), prop_bad = prop_u)
+
+#Combine constant and updating:
+graph_both <- rbind(graph_c, graph_u) %>% 
+  mutate(assess_int = factor(assessment_intervals, levels = intervals)) #relevel factors for graphing
+```
+
+Combined graph:  
+```{r graph-both, echo=FALSE}
+
+prop_bad_both <- ggplot(graph_both, aes(x=assess_int, y = prop_bad, fill = productivity)) + 
+  geom_col(position = "dodge") 
+prop_bad_both
+```
 

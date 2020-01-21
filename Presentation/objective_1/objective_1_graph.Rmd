@@ -11,7 +11,7 @@ library(tidyverse)
 ```
 
 ```{r}
-
+msy <- read_csv(file=file.path(here(), "/Tests/perfect_management/csv_results/perfect_noclim.csv"))
 noclim <- read_csv(file=file.path(here(),"/Presentation/objective_1/noclimate.csv"))
 noclim_perf <- read_csv(file=file.path(here(),"/Presentation/objective_1/noclimate_perfect.csv"))
 perfect <- read_csv(file=file.path(here(),"/Presentation/objective_1/perfect_climate.csv"))
@@ -20,6 +20,13 @@ realistic <- read_csv(file=file.path(here(),"/Presentation/objective_1/realistic
 ```
 
 ```{r}
+
+msy_1 <- msy %>% 
+  mutate(ID = id) %>% 
+  mutate(run = "msy") %>% 
+  filter(r_0 == 0.4) 
+  
+
 noclim_1 <- noclim %>%
   filter(r == 0.4) %>% 
   filter(hcr == 0.7) %>% 
@@ -35,20 +42,19 @@ noclim_perf_1 <- noclim_perf %>%
 perfect_1 <- perfect %>% 
   filter(r_0 == 0.4) %>% 
   filter(hcr == 0.7) %>% 
-  filter(r_s > -0.01167) %>% 
-  filter(r_s < -0.00767) %>% 
+  filter(r_s == -0.00767) %>% 
   mutate(run = "perfect") %>% 
   mutate(ID = id + 100)
 
 realistic_1 <- realistic %>%
   filter(r_0 == 0.4) %>% 
   filter(hcr == 0.7) %>% 
-  filter(r_s > -0.01167) %>% 
-  filter(r_s < -0.00767) %>% 
+  filter(r_s == -0.00767) %>% 
   mutate(run = "realistic") %>% 
   mutate(ID = id + 1000)
 
 all_results <- rbind(noclim_1, perfect_1, realistic_1, noclim_perf_1) %>% 
+  bind_rows(msy_1) %>% 
   group_by(ID) %>% 
   filter(b_0 == 1500)
 

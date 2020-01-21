@@ -266,7 +266,7 @@ sim_updating <- function(b, r, r_s, error, p, k, years, hcr){ #hcr term is added
 list_update <- list(
   b = c(1500, 4000),
   r = seq(0.1, .8, .1),
-  r_s = 0,
+  r_s = seq(-0.01767, 0.01623, 0.002),
   error = 0.1,
   p = 0.2,
   k = 10000,

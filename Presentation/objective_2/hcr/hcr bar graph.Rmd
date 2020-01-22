@@ -1,0 +1,29 @@
+---
+title: "hcr_bar_graph"
+author: "Chase"
+date: "1/22/2020"
+output: html_document
+---
+
+first, run code in "chase_analysis_jan14.rmd" located in the "Analysis" -> "hcrs_analysis" folder
+
+```{r}
+
+hcr_bar_10 <- ggplot(rep10c_c, aes(x = hcr, y = prop_bad)) +
+  geom_col()
+
+hcr_bar_10
+
+hcr_bar_5 <- ggplot(rep5c_c, aes(x = hcr, y = prop_bad)) +
+  geom_col()
+
+hcr_bar_5
+
+hcr_bar_both <- ggplot(rep_c, aes(x = hcr, y = prop_bad)) +
+  geom_col(aes(fill = hcr)) +
+  scale_x_reverse()
+
+hcr_bar_both
+
+```
+

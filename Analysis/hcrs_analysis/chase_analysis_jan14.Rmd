@@ -94,32 +94,41 @@ rep10u <- hcr_rep10u_le %>%
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
 
 rep5c_c <- rep5c %>%
-  group_by(hcr, growth) %>% 
+  group_by(hcr) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (over + closed)/(over + good + closed))
 
 rep5u_c <- rep5u %>%
-  group_by(hcr, growth) %>% 
+  group_by(hcr) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed)/(good + closed))
 
 rep10c_c <- rep10c %>%
-  group_by(hcr, growth) %>% 
+  group_by(hcr) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (over + closed)/(over + good + closed))
 
 rep10u_c <- rep10u %>%
-  group_by(hcr, growth) %>% 
+  group_by(hcr) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed)/(good + closed))
+
+
+rep_c <- rbind(rep5c, rep10c) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + closed + over))
+
 ```
 
 ```{r}

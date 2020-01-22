@@ -1,0 +1,19 @@
+---
+title: "ai_lowerror_analysis_graph"
+author: "Chase"
+date: "1/22/2020"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(here)
+```
+
+```{r}
+
+0rep <- read_csv(file=file.path(here(), "/Presentation/perfect_management/csv_results/perfect_noclim.csv"))
+
+
+```
+

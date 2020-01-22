@@ -10,6 +10,7 @@ output: html_document
 library(tidyverse)
 library(here)
 library(RColorBrewer)
+library(extrafont)
 
 #Data
 err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_hcr30.csv"))
@@ -116,8 +117,19 @@ prop_100_c$error <- as.factor(prop_100_c$error)
 
 #Graph with prop bad outcomes in year 100 (overfished + closed):
 prop_bad100_c <- ggplot(prop_100_c, aes(x = error, y = prop_bad)) +
-  geom_col()
+  geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5) +
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Error Assessments", x = "Error Amount (%)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA)) +
+  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_stack(vjust = 0.75), size = 7)
 prop_bad100_c
+
+ggsave(prop_bad100_c, filename = "error.png",  bg = "transparent")
+
+
 
 
 #Graph with prop closed in year 100 (out of the 408 simulations for each error bucket how many were closed in year 100) on y axis:
@@ -156,7 +168,17 @@ graph_both <- rbind(graph_c, graph_u)
 graph_both$error <- as.factor(graph_both$error)
 
 prop_100_both <- ggplot(graph_both, aes(x=error, y = prop_bad, fill = productivity)) + 
-  geom_col(position = "dodge") 
+  geom_col(position = "dodge", alpha = .7) +
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Fmsy \n(Productivity)", labels = c("Constant", "Updating"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Error Assessments", x = "Error Amount (%)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_dodge(0.9), vjust = 2, size = 5)
 prop_100_both
+
+ggsave(prop_100_both, filename = "error_both.png",  bg = "transparent")
+
 ```
 

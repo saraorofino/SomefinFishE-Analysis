@@ -118,9 +118,19 @@ Create the graph with prop_bad on y-axis and assessment intervals on the x-axis
 #Make sure the assessment intervals is a factor for graphing:
 graph_c$assessment_intervals <- as.factor(graph_c$assessment_intervals)
 
-prop_bad_c <- ggplot(graph_df, aes(x=assessment_intervals, y=prop_bad)) + 
-  geom_col()
+prop_bad_c <- ggplot(graph_c, aes(x=assessment_intervals, y=prop_bad)) + 
+  geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA)) +
+  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_stack(vjust = 0.75), size = 7)
 prop_bad_c
+
+ggsave(prop_bad_c, filename = "assessment.png",  bg = "transparent")
+
 ```
 
 ##Constant vs. Updating Fmsy
@@ -207,7 +217,22 @@ Combined graph:
 ```{r graph-both, echo=FALSE}
 
 prop_bad_both <- ggplot(graph_both, aes(x=assess_int, y = prop_bad, fill = productivity)) + 
-  geom_col(position = "dodge") 
+  geom_col(position = "dodge", alpha = .7) +
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Fmsy \n(Productivity)", labels = c("Constant", "Updating"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent")) +
+  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_dodge(0.9), vjust = 2, size = 4)
 prop_bad_both
+
+ggsave(prop_bad_both, filename = "assessment_both.png",  bg = "transparent")
+
+
+
+
+
+
 ```
 

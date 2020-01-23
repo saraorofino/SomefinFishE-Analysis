@@ -129,6 +129,13 @@ rep_c <- rbind(rep5c, rep10c) %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/(good + closed + over))
 
+rep_u <- rbind(rep5u, rep10u) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + closed + over))
+
 ```
 
 ```{r}

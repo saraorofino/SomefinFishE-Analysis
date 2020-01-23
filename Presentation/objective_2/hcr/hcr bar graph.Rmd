@@ -6,7 +6,81 @@ output: html_document
 ---
 
 first, run code in "chase_analysis_jan14.rmd" located in the "Analysis" -> "hcrs_analysis" folder
+Copying it here to run:
 
+Run this:
+```{r}
+hcr_rep5c_le <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_constantfmsy_5rep_lowerror.csv"))
+hcr_rep5u_le <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_updatingfmsy_5rep_lowerror.csv"))
+hcr_rep10c_le <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_constantfmsy_10rep_lowerror.csv"))
+hcr_rep10u_le <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_updatingfmsy_10rep_lowerror.csv"))
+
+rep5c <- hcr_rep5c_le %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
+
+rep5u <- hcr_rep5u_le %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
+
+rep10c <- hcr_rep10c_le %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
+  
+rep10u <- hcr_rep10u_le %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
+
+rep5c_c <- rep5c %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over + closed)/(over + good + closed))
+
+rep5u_c <- rep5u %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+rep10c_c <- rep10c %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over + closed)/(over + good + closed))
+
+rep10u_c <- rep10u %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+
+rep_c <- rbind(rep5c, rep10c) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + closed + over))
+
+rep_u <- rbind(rep5u, rep10u) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + closed + over))
+
+```
+
+Then this:
 ```{r}
 
 hcr_bar_10 <- ggplot(rep10c_c, aes(x = hcr, y = prop_bad)) +
@@ -25,5 +99,26 @@ hcr_bar_both <- ggplot(rep_c, aes(x = hcr, y = prop_bad)) +
 
 hcr_bar_both
 
+
+
+hcr_bar_u <- ggplot(rep_u, aes(x = hcr, y = prop_bad)) +
+  geom_col(aes(fill = hcr)) +
+  scale_x_reverse()
+
+hcr_bar_u
+
+rep_u_1 <- rep_u %>% 
+  mutate(msy = "updating")
+
+rep_c_1 <- rep_c %>% 
+  mutate(msy = "constant")
+
+rep_both <- rbind(rep_u_1, rep_c_1)
+
+hcr_bar_both <- ggplot(rep_both, aes(x = hcr, y = prop_bad)) +
+  geom_col(aes(fill = msy), position = "dodge") +
+  scale_x_reverse()
+
+hcr_bar_both
 ```
 

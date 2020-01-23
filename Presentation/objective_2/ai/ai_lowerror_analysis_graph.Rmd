@@ -12,8 +12,219 @@ library(here)
 
 ```{r}
 
-0rep <- read_csv(file=file.path(here(), "/Presentation/perfect_management/csv_results/perfect_noclim.csv"))
+rep_0 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_0rep_lowerror.csv"))
+rep_5 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror.csv"))
+rep_10 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep_lowerror.csv"))
+rep_15 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror.csv"))
+rep_20 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20rep_lowerror.csv"))
+
+```
+
+```{r}
+
+rep0_1 <- rep_0 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = "0") 
+
+rep5_1 <- rep_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = "5")
+
+rep10_1 <- rep_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 10)
+  
+rep15_1 <- rep_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 15)
+
+rep20_1 <- rep_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 20)
+
+c_rep0 <- rep0_1 %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over)/(over + good))
+
+c_rep5 <- rep5_1 %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+c_rep10 <- rep10_1 %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over + closed)/(over + good + closed))
+
+c_rep15 <- rep15_1 %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+c_rep20 <- rep20_1 %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
 
 
+ai_lowerror <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
+  filter(b_0 == 1500) %>% 
+  group_by(int) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/ (closed + over + good))
+
+
+ai_lowerror_all <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
+  group_by(int) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/ (closed + over + good))
+
+
+
+```
+
+
+```{r}
+ai_graph_1500 <- ggplot(ai_lowerror, aes(x = int, y = prop_bad)) +
+  geom_col()
+
+ai_graph_1500
+
+
+ai_graph_all <- ggplot(ai_lowerror_all, aes(x = int, y = prop_bad)) +
+  geom_col()
+
+ai_graph_all
+```
+
+
+UPDATING FMSY!!!!!!!
+
+
+```{r}
+
+rep_0u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_0rep_lowerror_updatingfmsy.csv"))
+rep_5u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror_updatingfmsy.csv"))
+rep_10u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep_lowerror_updatingfmsy.csv"))
+rep_15u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror_updatingfmsy.csv"))
+rep_20u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20rep_lowerror_updatingfmsy.csv"))
+
+```
+
+```{r}
+
+rep0_1u <- rep_0u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = "0") 
+
+rep5_1u <- rep_5u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = "5")
+
+rep10_1u <- rep_10u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 10)
+  
+rep15_1u <- rep_15u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 15)
+
+rep20_1u <- rep_20u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 20)
+
+c_rep0u <- rep0_1u %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over)/(over + good))
+
+c_rep5u <- rep5_1u %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+c_rep10u <- rep10_1u %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over + closed)/(over + good + closed))
+
+c_rep15u <- rep15_1u %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+c_rep20u <- rep20_1u %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>%
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+
+ai_lowerror_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
+  filter(b_0 == 1500) %>% 
+  group_by(int) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/ (closed + over + good))
+
+
+ai_lowerror_all_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
+  group_by(int) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/ (closed + over + good))
+
+
+
+```
+
+
+```{r}
+ai_graph_1500_u <- ggplot(ai_lowerror_u, aes(x = int, y = prop_bad)) +
+  geom_col()
+
+ai_graph_1500_u
+
+
+ai_graph_all_u <- ggplot(ai_lowerror_all_u, aes(x = int, y = prop_bad)) +
+  geom_col()
+
+ai_graph_all_u
 ```
 

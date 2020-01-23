@@ -17,7 +17,7 @@ err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_
 err_rep10u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep10_hcr30.csv"))
 err_rep5c <- read_csv(file=file.path(here(),"/Results/error/error_constant_rep5_hcr30.csv"))
 err_rep10c <- read_csv(file=file.path(here(),"/Results/error/error_constant_rep10_hcr30.csv"))
-
+err_rep5c_p <- read_csv(file=file.path(here(),"/Results/error/error_constant_rep5_hcr30_p.csv")) #compare perceived to error
 
 #Comparision of perfect management data
 perfect <- read_csv(file=file.path(here(),"/Tests/perfect_management/csv_results/perfect_r0.1.csv"))
@@ -86,6 +86,20 @@ prop_bad_c <- rep5c_edit %>%
   mutate(prop_wrong = no / total_decisions) %>% 
   mutate(prop_closed = fail / total_assessments)
 
+
+#Compare these outcomes for the simulation that looks at percieved and error instead of actual fmsy and error 
+prop_bad_p <- err_rep5c_p %>% 
+  filter(year == 1 | year %in% assess_5) %>%
+  group_by(error, correct_decision) %>% 
+  tally() %>% 
+  rename("count_5c" = n) %>% 
+  spread(key = "correct_decision", value = "count_5c") %>% 
+  mutate(total_decisions = sum(yes + no)) %>% 
+  mutate(total_assessments = sum(yes + no + fail)) %>% 
+  mutate(prop_wrong = no / total_decisions) %>% 
+  mutate(prop_closed = fail / total_assessments)
+#This makes SOOO much more sense - good job on figuring that out Chase!
+
 ```
 
 This time use Chase's method of Year 100 overfished, good, closed. Proportion of bad outcomes is closed + overfished  
@@ -107,12 +121,17 @@ prop_100_c <- rep5c_edit %>%
   mutate(prop_bad = sum(over + closed) / simulations)
 
 
+#For a bar graph with the columns by color you need a table that has error, then a variable "type" - over or closed, and then prop
+over <- data.frame(error = prop_100_c$error, type = rep("over",3), prop = prop_100_c$prop_over, productivity = rep("constant", 3))
+closed <- data.frame(error = prop_100_c$error, type = rep("closed", 3), prop = prop_100_c$prop_closed, productivity = rep("constant", 3))
+graph_df <- rbind(over, closed)
+
 ```
 
 
 ```{r constant-graphs, echo=FALSE}
 #Want to have error as a factor so that the graphs have a discrete x-axis:
-prop_100_c$error <- as.factor(prop_100_c$error)
+graph_df$error <- as.factor(graph_df$error)
 
 
 #Graph with prop bad outcomes in year 100 (overfished + closed):
@@ -127,15 +146,15 @@ prop_bad100_c <- ggplot(prop_100_c, aes(x = error, y = prop_bad)) +
   geom_text(aes(label = round(prop_bad, digits = 2)), position = position_stack(vjust = 0.75), size = 7)
 prop_bad100_c
 
-ggsave(prop_bad100_c, filename = "error.png",  bg = "transparent")
+#ggsave(prop_bad100_c, filename = "error.png",  bg = "transparent")
 
 
+##Try the other graph with the fill by type:
+prop_graph <- ggplot(graph_df, aes(x=error, y=prop)) + 
+  geom_col(aes(fill = type), alpha = 0.7)
+prop_graph
 
 
-#Graph with prop closed in year 100 (out of the 408 simulations for each error bucket how many were closed in year 100) on y axis:
-# prop_closed100_c <- ggplot(prop_100_c, aes(x = error, y = prop_closed)) + 
-#   geom_col()
-# prop_closed100_c
 ```
 
 ##Constant vs. Updating Fmsy
@@ -157,10 +176,9 @@ prop_100_u <- err_rep5u %>%
   mutate(simulations = sum(closed + good)) %>% 
   mutate(prop_bad = closed / simulations) 
 
-##Create the graph data frame - start with constant and updating then merge:
-graph_c <- data.frame(error = prop_100_c$error, productivity = rep("constant", 3), prop_bad = prop_100_c$prop_bad)
-graph_u <- data.frame(error = prop_100_u$error, productivity = rep("updating", 3), prop_bad = prop_100_u$prop_bad)
-graph_both <- rbind(graph_c, graph_u)
+##Create the graph data frame - use the constant df (graph_df) from above:
+graph_u <- data.frame(error = prop_100_u$error, type = rep("closed", 3), prop = prop_100_u$prop_bad, productivity = rep("updating", 3))
+graph_both <- rbind(graph_df, graph_u)
 ```
 
 ```{r combined-graph, echo=FALSE}
@@ -178,7 +196,14 @@ prop_100_both <- ggplot(graph_both, aes(x=error, y = prop_bad, fill = productivi
   geom_text(aes(label = round(prop_bad, digits = 2)), position = position_dodge(0.9), vjust = 2, size = 5)
 prop_100_both
 
-ggsave(prop_100_both, filename = "error_both.png",  bg = "transparent")
+#ggsave(prop_100_both, filename = "error_both.png",  bg = "transparent")
+
+##Try the other graph with the fill by type:
+prop_graph_both <- ggplot(graph_both, aes(x=error, y=prop)) + 
+  geom_col(aes(fill = productivity), position = "dodge", alpha = 0.7)
+prop_graph_both
+
+##Okay this is significantly harder... if we fill by productivity to distinguish between constant and updating we can't also fill by over/closed. The udpating fmsy one has no over it's only closed. Not sure if there's a way around this
 
 ```
 

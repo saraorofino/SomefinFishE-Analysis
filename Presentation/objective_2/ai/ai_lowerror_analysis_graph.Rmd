@@ -5,12 +5,13 @@ date: "1/22/2020"
 output: html_document
 ---
 
+#{.tabset}
 ```{r}
 library(tidyverse)
 library(here)
 ```
 
-```{r}
+```{r setup, include=FALSE, message=FALSE, warning = FALSE}
 
 rep_0 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_0rep_lowerror.csv"))
 rep_5 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror.csv"))
@@ -20,7 +21,9 @@ rep_20 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20rep
 
 ```
 
-```{r}
+##Constant Fmsy:  
+Constant fmsy wrangling:  
+```{r constant-ai-wrangle, include=FALSE}
 
 rep0_1 <- rep_0 %>% 
   filter(year == 100) %>% 
@@ -103,14 +106,15 @@ ai_lowerror_all <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
 
 ```
 
-
-```{r}
+Want to show all the runs together and then also break out only the starting biomass of 1500:  
+```{r constant-ai-graphs, echo=FALSE}
+##Results filter for just 1500 biomass:
 ai_graph_1500 <- ggplot(ai_lowerror, aes(x = int, y = prop_bad)) +
   geom_col()
 
 ai_graph_1500
 
-
+##All results:
 ai_graph_all <- ggplot(ai_lowerror_all, aes(x = int, y = prop_bad)) +
   geom_col()
 
@@ -118,10 +122,10 @@ ai_graph_all
 ```
 
 
-UPDATING FMSY!!!!!!!
+##Updating Fmsy:  
 
 
-```{r}
+```{r setup-updating, include=FALSE, message=FALSE, warning=FALSE}
 
 rep_0u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_0rep_lowerror_updatingfmsy.csv"))
 rep_5u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror_updatingfmsy.csv"))
@@ -131,7 +135,9 @@ rep_20u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20re
 
 ```
 
-```{r}
+Wrangle updating data:  
+
+```{r updating-ai-wrangle, include=FALSE}
 
 rep0_1u <- rep_0u %>% 
   filter(year == 100) %>% 
@@ -214,17 +220,40 @@ ai_lowerror_all_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
 
 ```
 
+Create the graph dataframe:  
+```{r wrangle-graph-data, include=FALSE}
+#Create factor levels
+intervals <- c("Never",20,15,10,5) 
+intervals_f <- factor(intervals, levels = intervals)
+##Create the all graph data frame - start with constant and add updating then merge:
+graph_c <- data.frame(assessment_interval = ai_lowerror_u$int, productivity = rep("constant", 5), prop_bad = ai_lowerror_all$prop_bad)
+graph_u <- data.frame(assessment_interval = ai_lowerror_u$int, productivity = rep("updating", 5), prop_bad = ai_lowerror_all_u$prop_bad)
+graph_both_all <- rbind(graph_c, graph_u) %>% 
+  mutate(assess_int = rep(intervals_f, 2)) #change intervals to a factor
 
-```{r}
-ai_graph_1500_u <- ggplot(ai_lowerror_u, aes(x = int, y = prop_bad)) +
-  geom_col()
 
-ai_graph_1500_u
+##Create the 1500 graph data frame - start with constant and updating separately then merge:
+graph_c1500 <- data.frame(assessment_interval = ai_lowerror$int, productivity = rep("constant", 5), prop_bad = ai_lowerror$prop_bad)
+graph_u1500 <- data.frame(assessment_interval = ai_lowerror$int, productivity = rep("updating", 5), prop_bad = ai_lowerror_u$prop_bad)
+graph_both1500 <- rbind(graph_c1500, graph_u1500) %>% 
+  mutate(assess_int = rep(intervals_f, 2)) #change intervals to a factor
+
+```
 
 
-ai_graph_all_u <- ggplot(ai_lowerror_all_u, aes(x = int, y = prop_bad)) +
-  geom_col()
 
-ai_graph_all_u
+Graphs for both 1500 and all using the constant vs. updating fmsy:  
+```{r updating-graphs, echo=FALSE}
+
+ai_1500_both <- ggplot(graph_both1500, aes(x = assess_int, y = prop_bad, fill = productivity)) +
+  geom_col(position = "dodge")
+
+ai_1500_both
+
+
+ai_all_both <- ggplot(graph_both_all, aes(x = assess_int, y = prop_bad, fill = productivity)) +
+  geom_col(position = "dodge")
+
+ai_all_both
 ```
 

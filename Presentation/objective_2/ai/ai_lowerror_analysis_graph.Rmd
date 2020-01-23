@@ -55,51 +55,24 @@ rep20_1 <- rep_20 %>%
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
   mutate(int = 20)
 
-c_rep0 <- rep0_1 %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (over)/(over + good))
-
-c_rep5 <- rep5_1 %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed)/(good + closed))
-
-c_rep10 <- rep10_1 %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (over + closed)/(over + good + closed))
-
-c_rep15 <- rep15_1 %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed)/(good + closed))
-
-c_rep20 <- rep20_1 %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed)/(good + closed))
-
+#Define the interval factors:
 intervals <- c("Never",20,15,10,5) 
 intervals_f <- factor(intervals, levels = intervals)
 
+#Combine data sets for starting biomass of 1500:
 ai_lowerror <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
   filter(b_0 == 1500) %>% 
-  mutate(assess_int = factor(int, levels = intervals)) %>% 
-  group_by(assess_int) %>% 
+  mutate(assess_int = factor(int, levels = intervals)) %>%
+  group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/ (closed + over + good)) 
 
+#Combine all data sets:
 ai_lowerror_all <- rbind(rep0_1, rep20_1, rep15_1, rep10_1, rep5_1) %>%
   mutate(assess_int = factor(int, levels = intervals)) %>%
-  group_by(assess_int) %>% 
+  group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
@@ -123,7 +96,7 @@ ai_graph_1500 <- ggplot(ai_lowerror, aes(x = assess_int, y = prop_bad)) +
   geom_text(aes(label = round(prop_bad, digits = 2)), position = position_stack(vjust = 0.75), size = 7)
 
 ai_graph_1500
-ggsave(ai_graph_1500, filename = "assessment1.png",  bg = "transparent")
+#ggsave(ai_graph_1500, filename = "assessment1.png",  bg = "transparent")
 
 
 
@@ -161,7 +134,7 @@ rep0_1u <- rep_0u %>%
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = "0") 
+  mutate(int = "Never") 
 
 rep5_1u <- rep_5u %>% 
   filter(year == 100) %>% 
@@ -187,48 +160,27 @@ rep20_1u <- rep_20u %>%
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
   mutate(int = 20)
 
-c_rep0u <- rep0_1u %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (over)/(over + good))
 
-c_rep5u <- rep5_1u %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed)/(good + closed))
+#Define the interval factors:
+intervals <- c("Never",20,15,10,5) 
+intervals_f <- factor(intervals, levels = intervals)
 
-c_rep10u <- rep10_1u %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (over + closed)/(over + good + closed))
-
-c_rep15u <- rep15_1u %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed)/(good + closed))
-
-c_rep20u <- rep20_1u %>%
-  count(status) %>% 
-  spread(key = "status", value = "n") %>%
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed)/(good + closed))
-
+#Combine for starting biomass 1500:
 
 ai_lowerror_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
   filter(b_0 == 1500) %>% 
-  group_by(int) %>% 
+  mutate(assess_int = factor(int, levels = intervals)) %>%
+  group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/ (closed + over + good))
 
 
+#Combine for all:
 ai_lowerror_all_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
-  group_by(int) %>% 
+  mutate(assess_int = factor(int, levels = intervals)) %>%
+  group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
@@ -240,22 +192,17 @@ ai_lowerror_all_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
 
 Create the graph dataframe:  
 ```{r wrangle-graph-data, include=FALSE}
-#Create factor levels
-intervals <- c("Never",20,15,10,5) 
-intervals_f <- factor(intervals, levels = intervals)
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_lowerror$int, productivity = rep("constant", 5), prop_bad = ai_lowerror_all$prop_bad)
-graph_u <- data.frame(assessment_interval = ai_lowerror_u$int, productivity = rep("updating", 5), prop_bad = ai_lowerror_all_u$prop_bad)
-graph_both_all <- rbind(graph_c, graph_u) %>% 
-  mutate(assess_int = rep(intervals_f, 2)) #change intervals to a factor
+graph_c <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 5), prop_bad = ai_lowerror_all$prop_bad)
+graph_u <- data.frame(assessment_interval = ai_lowerror_u$assess_int, productivity = rep("updating", 5), prop_bad = ai_lowerror_all_u$prop_bad)
+graph_both_all <- rbind(graph_c, graph_u)
 
 
 ##Create the 1500 graph data frame - start with constant and updating separately then merge:
-graph_c1500 <- data.frame(assessment_interval = ai_lowerror$int, productivity = rep("constant", 5), prop_bad = ai_lowerror$prop_bad)
-graph_u1500 <- data.frame(assessment_interval = ai_lowerror$int, productivity = rep("updating", 5), prop_bad = ai_lowerror_u$prop_bad)
-graph_both1500 <- rbind(graph_c1500, graph_u1500) %>% 
-  mutate(assess_int = rep(intervals_f, 2)) #change intervals to a factor
+graph_c1500 <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 5), prop_bad = ai_lowerror$prop_bad)
+graph_u1500 <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("updating", 5), prop_bad = ai_lowerror_u$prop_bad)
+graph_both1500 <- rbind(graph_c1500, graph_u1500) 
 
 ```
 
@@ -264,7 +211,7 @@ graph_both1500 <- rbind(graph_c1500, graph_u1500) %>%
 Graphs for both 1500 and all using the constant vs. updating fmsy:  
 ```{r updating-graphs, echo=FALSE}
 
-ai_1500_both <- ggplot(graph_both1500, aes(x = assess_int, y = prop_bad, fill = productivity)) +
+ai_1500_both <- ggplot(graph_both1500, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
   geom_col(position = "dodge", alpha = .7) +
   scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Fmsy \n(Productivity)", labels = c("Constant", "Updating"))+
   theme_light()+
@@ -276,9 +223,9 @@ ai_1500_both <- ggplot(graph_both1500, aes(x = assess_int, y = prop_bad, fill = 
   geom_text(aes(label = round(prop_bad, digits = 2)), position = position_dodge(0.8), vjust = 2, size = 3.5)
 
 ai_1500_both
-ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
+#ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
 
-ai_all_both <- ggplot(graph_both_all, aes(x = assess_int, y = prop_bad, fill = productivity)) +
+ai_all_both <- ggplot(graph_both_all, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
   geom_col(position = "dodge")
 
 ai_all_both

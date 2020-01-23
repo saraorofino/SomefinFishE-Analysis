@@ -29,13 +29,13 @@ rep0_1 <- rep_0 %>%
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = "0") 
+  mutate(int = "Never") 
 
 rep5_1 <- rep_5 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = "5")
+  mutate(int = 5)
 
 rep10_1 <- rep_10 %>% 
   filter(year == 100) %>% 
@@ -85,23 +85,25 @@ c_rep20 <- rep20_1 %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed)/(good + closed))
 
+intervals <- c("Never",20,15,10,5) 
+intervals_f <- factor(intervals, levels = intervals)
 
 ai_lowerror <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
   filter(b_0 == 1500) %>% 
-  group_by(int) %>% 
+  mutate(assess_int = factor(int, levels = intervals)) %>% 
+  group_by(assess_int) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed + over)/ (closed + over + good))
+  mutate(prop_bad = (closed + over)/ (closed + over + good)) 
 
-
-ai_lowerror_all <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
-  group_by(int) %>% 
+ai_lowerror_all <- rbind(rep0_1, rep20_1, rep15_1, rep10_1, rep5_1) %>%
+  mutate(assess_int = factor(int, levels = intervals)) %>%
+  group_by(assess_int) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed + over)/ (closed + over + good))
-
+  mutate(prop_bad = (closed + over)/ (closed + over + good)) 
 
 
 ```
@@ -109,16 +111,32 @@ ai_lowerror_all <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
 Want to show all the runs together and then also break out only the starting biomass of 1500:  
 ```{r constant-ai-graphs, echo=FALSE}
 ##Results filter for just 1500 biomass:
-ai_graph_1500 <- ggplot(ai_lowerror, aes(x = int, y = prop_bad)) +
-  geom_col()
+ai_graph_1500 <- ggplot(ai_lowerror, aes(x = assess_int, y = prop_bad)) +
+  geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
+    legend.box.background = element_blank()) +
+  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_stack(vjust = 0.75), size = 7)
 
 ai_graph_1500
+ggsave(ai_graph_1500, filename = "assessment1.png",  bg = "transparent")
+
+
 
 ##All results:
-ai_graph_all <- ggplot(ai_lowerror_all, aes(x = int, y = prop_bad)) +
+ai_graph_all <- ggplot(ai_lowerror_all, aes(x = assess_int, y = prop_bad)) +
   geom_col()
 
 ai_graph_all
+
+
+
+
+
 ```
 
 
@@ -225,8 +243,9 @@ Create the graph dataframe:
 #Create factor levels
 intervals <- c("Never",20,15,10,5) 
 intervals_f <- factor(intervals, levels = intervals)
+
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_lowerror_u$int, productivity = rep("constant", 5), prop_bad = ai_lowerror_all$prop_bad)
+graph_c <- data.frame(assessment_interval = ai_lowerror$int, productivity = rep("constant", 5), prop_bad = ai_lowerror_all$prop_bad)
 graph_u <- data.frame(assessment_interval = ai_lowerror_u$int, productivity = rep("updating", 5), prop_bad = ai_lowerror_all_u$prop_bad)
 graph_both_all <- rbind(graph_c, graph_u) %>% 
   mutate(assess_int = rep(intervals_f, 2)) #change intervals to a factor
@@ -246,10 +265,18 @@ Graphs for both 1500 and all using the constant vs. updating fmsy:
 ```{r updating-graphs, echo=FALSE}
 
 ai_1500_both <- ggplot(graph_both1500, aes(x = assess_int, y = prop_bad, fill = productivity)) +
-  geom_col(position = "dodge")
+  geom_col(position = "dodge", alpha = .7) +
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Fmsy \n(Productivity)", labels = c("Constant", "Updating"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) +
+  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_dodge(0.8), vjust = 2, size = 3.5)
 
 ai_1500_both
-
+ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
 
 ai_all_both <- ggplot(graph_both_all, aes(x = assess_int, y = prop_bad, fill = productivity)) +
   geom_col(position = "dodge")

@@ -225,7 +225,7 @@ Re-saved CSV file on 1/13 after updating the HCR to 30% reduction (SO)
 #Create the list of column names:
 
 col_names <- c("b", "c", "year", "r", "f", "f_msy", "f_ratio", "f_ratio_p", "f_ratio_err", "id", "r_0", "error", "r_s",
-               "ratio_cat", "ratio_err_cat", "decision_made", "correct_decision")
+               "ratio_p_cat", "ratio_err_cat", "decision_made", "correct_decision")
 
 #Create a new list with ids
 results_id <- list()
@@ -244,29 +244,45 @@ for(i in 1:1224){
 results_rep5c <- bind_rows(results_id)
 
 #Mutate columns to compare f_ratio to f_ratio_err 
+# results_rep5c_edit <- results_rep5c %>%
+# mutate(ratio_cat = case_when(results_rep5c$V7 == 0 ~ 0,
+#                                results_rep5c$V7 <= 1 & results_rep5c$V7 != 0 ~ 1,
+#                                results_rep5c$V7 > 1 & results_rep5c$V7 < 2 ~ 2,
+#                                results_rep5c$V7 > 2 ~ 3)) %>% 
+#   mutate(ratio_err_cat = case_when(results_rep5c$V9 == 0 ~ 0,
+#                                results_rep5c$V9 > 0 & results_rep5c$V9 <= 1 ~ 1,
+#                                results_rep5c$V9 > 1 & results_rep5c$V9 < 2 ~ 2,
+#                                results_rep5c$V9 > 2 ~ 3)) %>%
+#   mutate(decision_made = case_when(ratio_cat == ratio_err_cat & ratio_cat !=0 ~ "yes",
+#                                       ratio_cat != ratio_err_cat ~ "yes",
+#                                       ratio_cat == ratio_err_cat & ratio_cat == 0 ~ "no")) %>% 
+#   mutate(correct_decision = case_when(ratio_cat == ratio_err_cat & ratio_cat !=0 ~ "yes",
+#                                       ratio_cat != ratio_err_cat ~ "no",
+#                                       ratio_cat == ratio_err_cat & ratio_cat == 0 ~ "fail"))
+
+#Mutate columns to compare f_ratio_p and f_ratio_err
 results_rep5c_edit <- results_rep5c %>%
-mutate(ratio_cat = case_when(results_rep5c$V7 == 0 ~ 0,
-                               results_rep5c$V7 <= 1 & results_rep5c$V7 != 0 ~ 1,
-                               results_rep5c$V7 > 1 & results_rep5c$V7 < 2 ~ 2,
-                               results_rep5c$V7 > 2 ~ 3)) %>% 
+mutate(ratio_p_cat = case_when(results_rep5c$V8 == 0 ~ 0,
+                               results_rep5c$V8 <= 1 & results_rep5c$V8 != 0 ~ 1,
+                               results_rep5c$V8 > 1 & results_rep5c$V8 < 2 ~ 2,
+                               results_rep5c$V8 > 2 ~ 3)) %>% 
   mutate(ratio_err_cat = case_when(results_rep5c$V9 == 0 ~ 0,
                                results_rep5c$V9 > 0 & results_rep5c$V9 <= 1 ~ 1,
                                results_rep5c$V9 > 1 & results_rep5c$V9 < 2 ~ 2,
                                results_rep5c$V9 > 2 ~ 3)) %>%
-  mutate(decision_made = case_when(ratio_cat == ratio_err_cat & ratio_cat !=0 ~ "yes",
-                                      ratio_cat != ratio_err_cat ~ "yes",
-                                      ratio_cat == ratio_err_cat & ratio_cat == 0 ~ "no")) %>% 
-  mutate(correct_decision = case_when(ratio_cat == ratio_err_cat & ratio_cat !=0 ~ "yes",
-                                      ratio_cat != ratio_err_cat ~ "no",
-                                      ratio_cat == ratio_err_cat & ratio_cat == 0 ~ "fail"))
-
+  mutate(decision_made = case_when(ratio_p_cat == ratio_err_cat & ratio_p_cat !=0 ~ "yes",
+                                      ratio_p_cat != ratio_err_cat ~ "yes",
+                                      ratio_p_cat == ratio_err_cat & ratio_p_cat == 0 ~ "no")) %>% 
+  mutate(correct_decision = case_when(ratio_p_cat == ratio_err_cat & ratio_p_cat !=0 ~ "yes",
+                                      ratio_p_cat != ratio_err_cat ~ "no",
+                                      ratio_p_cat == ratio_err_cat & ratio_p_cat == 0 ~ "fail"))
 #Update the column names:
 colnames(results_rep5c_edit) <- col_names
 
 #Write as CSV:
 # library(here)
 # write.csv(results_rep5c_edit,
-#           file=file.path(here(),"/Results/error/error_constant_rep5_hcr30.csv"),
+#           file=file.path(here(),"/Results/error/error_constant_rep5_hcr30_p.csv"),
 #           row.names = FALSE)
 
 ```

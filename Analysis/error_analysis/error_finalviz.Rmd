@@ -176,16 +176,22 @@ prop_100_u <- err_rep5u %>%
   mutate(simulations = sum(closed + good)) %>% 
   mutate(prop_bad = closed / simulations) 
 
-##Create the graph data frame - use the constant df (graph_df) from above:
-graph_u <- data.frame(error = prop_100_u$error, type = rep("closed", 3), prop = prop_100_u$prop_bad, productivity = rep("updating", 3))
-graph_both <- rbind(graph_df, graph_u)
+##Create the graph data frame - constant then updating and combine:
+graph_c <- data.frame(error = prop_100_c$error, prop = prop_100_c$prop_bad, productivity = rep("constant", 3))
+graph_u <- data.frame(error = prop_100_u$error, prop = prop_100_u$prop_bad, productivity = rep("updating", 3))
+graph_both <- rbind(graph_c, graph_u)
+
+#Combine using the constant (graph_df) from above for the second fill by type graph:
+graph_u2 <- data.frame(error = prop_100_u$error, type = rep("closed", 3), prop = prop_100_u$prop_bad, productivity = rep("updating", 3))
+graph_both2 <- rbind(graph_df, graph_u2)
+graph_both2$error <- as.factor(graph_both2$error)
 ```
 
 ```{r combined-graph, echo=FALSE}
 #Want to have error as a factor so that the graphs have a discrete x-axis:
 graph_both$error <- as.factor(graph_both$error)
 
-prop_100_both <- ggplot(graph_both, aes(x=error, y = prop_bad, fill = productivity)) + 
+prop_100_both <- ggplot(graph_both, aes(x=error, y = prop, fill = productivity)) + 
   geom_col(position = "dodge", alpha = .7) +
   scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Fmsy \n(Productivity)", labels = c("Constant", "Updating"))+
   theme_light()+
@@ -199,7 +205,7 @@ prop_100_both
 #ggsave(prop_100_both, filename = "error_both.png",  bg = "transparent")
 
 ##Try the other graph with the fill by type:
-prop_graph_both <- ggplot(graph_both, aes(x=error, y=prop)) + 
+prop_graph_both <- ggplot(graph_both2, aes(x=error, y=prop)) + 
   geom_col(aes(fill = productivity), position = "dodge", alpha = 0.7)
 prop_graph_both
 

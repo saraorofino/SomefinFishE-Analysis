@@ -6,6 +6,7 @@ output: html_document
 ---
 ```{r}
 library(tidyverse)
+library(here)
 ```
 
 
@@ -19,6 +20,21 @@ low_err_10 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiont
 mid_err_10 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_miderr_10.csv"))
 high_err_10 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_higherr_10.csv"))
 
+low_err_15 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_lowerr_15.csv"))
+mid_err_15 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_miderr_15.csv"))
+high_err_15 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_higherr_15.csv"))
+
+low_err_20 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_lowerr_20.csv"))
+mid_err_20 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_miderr_20.csv"))
+high_err_20 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_higherr_20.csv"))
+
+low_err_0 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_lowerr_0.csv"))
+mid_err_0 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_miderr_0.csv"))
+high_err_0 <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_higherr_0.csv"))
+
+low_err_all <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_lowerr_all.csv"))
+mid_err_all <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_miderr_all.csv"))
+high_err_all <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_higherr_all.csv"))
 
 low_err_1 <- low_err %>% 
   filter(year == 100) %>% 
@@ -56,9 +72,81 @@ high_err_2 <- high_err_10 %>%
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
   mutate(assess = "10")
   
+low_err_3 <- low_err_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
 
-decisiontable_all <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_err_2) %>% 
-  group_by(error, assess, hcr) %>% 
+mid_err_3 <- mid_err_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+high_err_3 <- high_err_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+low_err_4 <- low_err_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+mid_err_4 <- mid_err_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+high_err_4 <- high_err_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+low_err_5 <- low_err_0 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+mid_err_5 <- mid_err_0 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+high_err_5 <- high_err_0 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+low_err_6 <- low_err_all %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+mid_err_6 <- mid_err_all %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+high_err_6 <- high_err_all %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+
+decisiontable_all <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_err_2, low_err_3, mid_err_3, high_err_3, low_err_4, mid_err_4, high_err_4, low_err_5, mid_err_5, high_err_5, low_err_6, mid_err_6, high_err_6) %>%
+  group_by(error, growth, hcr) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 

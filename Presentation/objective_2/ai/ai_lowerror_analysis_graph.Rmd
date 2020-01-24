@@ -10,10 +10,11 @@ output: html_document
 library(tidyverse)
 library(here)
 ```
-
+Read in constant fmsy data:  
 ```{r setup, include=FALSE, message=FALSE, warning = FALSE}
 
 rep_0 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_0rep_lowerror.csv"))
+rep_1 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_rep1_constant.csv"))
 rep_5 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror.csv"))
 rep_10 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep_lowerror.csv"))
 rep_15 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror.csv"))
@@ -26,11 +27,19 @@ Constant fmsy wrangling:
 ```{r constant-ai-wrangle, include=FALSE}
 
 rep0_1 <- rep_0 %>% 
+  mutate(closed = ifelse(f_ratio >= 2, "closed", "no")) %>% #need to add a way to track closed otherwise it will only show as overfished
+  filter(year == 100) %>% 
+  mutate(status = ifelse(closed == "closed", "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = "Never") %>% 
+  select(-closed)
+
+rep1_1 <- rep_1 %>%
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = "Never") 
-
+  mutate(int = 1)   
+  
 rep5_1 <- rep_5 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
@@ -56,21 +65,23 @@ rep20_1 <- rep_20 %>%
   mutate(int = 20)
 
 #Define the interval factors:
-intervals <- c("Never",20,15,10,5) 
+intervals <- c("Never",20,15,10,5,1) 
 intervals_f <- factor(intervals, levels = intervals)
 
 #Combine data sets for starting biomass of 1500:
-ai_lowerror <- rbind(rep0_1, rep5_1, rep10_1, rep15_1, rep20_1) %>%
+ai_lowerror <- rbind(rep0_1, rep5_1, rep1_1, rep10_1, rep15_1, rep20_1) %>%
   filter(b_0 == 1500) %>% 
   mutate(assess_int = factor(int, levels = intervals)) %>%
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_over = over / (closed + over + good)) %>% 
+  mutate(prop_closed = closed / (closed + over + good)) %>% 
   mutate(prop_bad = (closed + over)/ (closed + over + good)) 
 
 #Combine all data sets:
-ai_lowerror_all <- rbind(rep0_1, rep20_1, rep15_1, rep10_1, rep5_1) %>%
+ai_lowerror_all <- rbind(rep0_1, rep20_1, rep15_1, rep10_1, rep5_1, rep1_1) %>%
   mutate(assess_int = factor(int, levels = intervals)) %>%
   group_by(assess_int) %>%
   count(status) %>% 
@@ -78,6 +89,10 @@ ai_lowerror_all <- rbind(rep0_1, rep20_1, rep15_1, rep10_1, rep5_1) %>%
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/ (closed + over + good)) 
 
+#For a bar graph with the columns by color you need a table that has error, then a variable "type" - over or closed, and then prop
+over <- data.frame(assess_int = ai_lowerror$assess_int, type = rep("over",6), prop = ai_lowerror$prop_over)
+closed <- data.frame(assess_int = ai_lowerror$assess_int, type = rep("closed",6), prop = ai_lowerror$prop_closed)
+graph_df <- rbind(over, closed)
 
 ```
 
@@ -99,16 +114,10 @@ ai_graph_1500
 #ggsave(ai_graph_1500, filename = "assessment1.png",  bg = "transparent")
 
 
-
-##All results:
-ai_graph_all <- ggplot(ai_lowerror_all, aes(x = assess_int, y = prop_bad)) +
-  geom_col()
-
-ai_graph_all
-
-
-
-
+##Stacked columns for 1500 biomass:
+ai_graph_stack <- ggplot(graph_df, aes(x= assess_int, y = prop)) +
+  geom_col(aes(fill = type), alpha = .7)
+ai_graph_stack
 
 ```
 
@@ -119,6 +128,7 @@ ai_graph_all
 ```{r setup-updating, include=FALSE, message=FALSE, warning=FALSE}
 
 rep_0u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_0rep_lowerror_updatingfmsy.csv"))
+rep_1u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_rep1_updating.csv"))
 rep_5u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror_updatingfmsy.csv"))
 rep_10u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep_lowerror_updatingfmsy.csv"))
 rep_15u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror_updatingfmsy.csv"))
@@ -135,6 +145,12 @@ rep0_1u <- rep_0u %>%
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
   mutate(int = "Never") 
+
+rep1_1u <- rep_1u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 1)
 
 rep5_1u <- rep_5u %>% 
   filter(year == 100) %>% 
@@ -162,12 +178,12 @@ rep20_1u <- rep_20u %>%
 
 
 #Define the interval factors:
-intervals <- c("Never",20,15,10,5) 
+intervals <- c("Never",20,15,10,5,1) 
 intervals_f <- factor(intervals, levels = intervals)
 
 #Combine for starting biomass 1500:
 
-ai_lowerror_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
+ai_lowerror_u <- rbind(rep0_1u, rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
   filter(b_0 == 1500) %>% 
   mutate(assess_int = factor(int, levels = intervals)) %>%
   group_by(assess_int) %>%
@@ -178,7 +194,7 @@ ai_lowerror_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
 
 
 #Combine for all:
-ai_lowerror_all_u <- rbind(rep0_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
+ai_lowerror_all_u <- rbind(rep0_1u, rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
   mutate(assess_int = factor(int, levels = intervals)) %>%
   group_by(assess_int) %>%
   count(status) %>% 
@@ -194,14 +210,15 @@ Create the graph dataframe:
 ```{r wrangle-graph-data, include=FALSE}
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 5), prop_bad = ai_lowerror_all$prop_bad)
-graph_u <- data.frame(assessment_interval = ai_lowerror_u$assess_int, productivity = rep("updating", 5), prop_bad = ai_lowerror_all_u$prop_bad)
+graph_c <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 6), prop_bad = ai_lowerror_all$prop_bad)
+graph_u <- data.frame(assessment_interval = ai_lowerror_u$assess_int, productivity = rep("updating", 6),
+                      prop_bad = ai_lowerror_all_u$prop_bad)
 graph_both_all <- rbind(graph_c, graph_u)
 
 
 ##Create the 1500 graph data frame - start with constant and updating separately then merge:
-graph_c1500 <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 5), prop_bad = ai_lowerror$prop_bad)
-graph_u1500 <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("updating", 5), prop_bad = ai_lowerror_u$prop_bad)
+graph_c1500 <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 6), prop_bad = ai_lowerror$prop_bad)
+graph_u1500 <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("updating", 6), prop_bad = ai_lowerror_u$prop_bad)
 graph_both1500 <- rbind(graph_c1500, graph_u1500) 
 
 ```

@@ -271,7 +271,7 @@ list_update <- list(
   p = 0.2,
   k = 10000,
   years = 100,
-  hcr = seq(0.90, 0.60, -0.05)
+  hcr = seq(0.90, 0.70, -0.1)
 )
 
 input_update <- list_update %>%
@@ -285,15 +285,22 @@ list_update$r_s
 
 results = list()
 
-#Run the model over the input lists:
+#Run the CONSTANT model over the input lists:
 
-for(i in 1:112){
+for(i in 1:816){
   results[[i]] <- sim_constant(b=input_update[[i]]$b, r=input_update[[i]]$r,
                              r_s=input_update[[i]]$r_s, p=input_update[[i]]$p,
                              k=input_update[[i]]$k,years=input_update[[i]]$years, 
                              error = input_update[[i]]$error, hcr = input_update[[i]]$hcr)
 }
 
+#Run the UPDATING model over the input list:
+for(i in 1:816){
+  results[[i]] <- sim_updating(b=input_update[[i]]$b, r=input_update[[i]]$r,
+                             r_s=input_update[[i]]$r_s, p=input_update[[i]]$p,
+                             k=input_update[[i]]$k,years=input_update[[i]]$years, 
+                             error = input_update[[i]]$error, hcr = input_update[[i]]$hcr)
+}
 ```
 
 ```{r save-csv}
@@ -306,7 +313,7 @@ col_names <- c("b", "c", "year", "r", "f", "f_msy", "f_ratio", "f_ratio_p", "f_r
 results_id <- list()
 
 #Loop to add ids to each experiment in the list - make sure the 1:xxx matches the number of lists in the results
-for(i in 1:112){
+for(i in 1:816){
   dat <- as.data.frame(matrix(unlist(results[i]), ncol = 9))
   dat$id <- i
   dat$r_0 <- rep(input_update[[i]]$r, 100)
@@ -323,9 +330,9 @@ results_update <- bind_rows(results_id)
 colnames(results_update) <- col_names
 
 #Write as CSV:
-library(here)
-write.csv(results_update, file=file.path(here(),"/Presentation/objective_1/noclimate_perfect.csv"),
-            row.names = FALSE)
+# library(here)
+# write.csv(results_update, file=file.path(here(),"/Presentation/objective_2/ai/ai_rep1_updating.csv"),
+#             row.names = FALSE)
 
 ```
 

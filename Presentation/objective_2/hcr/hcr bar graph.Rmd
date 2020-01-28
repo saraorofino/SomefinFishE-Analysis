@@ -160,7 +160,7 @@ hcr_bar_both <- ggplot(rep_both, aes(x = hcr, y = prop_bad)) +
   theme_light() +
   scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
   coord_cartesian(expand = FALSE, xlim = c(1, 0.45), ylim = c(0, 0.55)) +
-  labs(title = "Harvest Control Rule Assessments", x = "Reduction Amount", y = "Proportion Closed/Overfished") +
+  labs(title = "Harvest Control Rules", x = "Reduction Amount", y = "Proportion Closed/Overfished") +
   theme(
   axis.text.x = element_text(size = 15),
   axis.text.y = element_text(size = 15),

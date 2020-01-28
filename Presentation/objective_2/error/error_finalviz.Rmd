@@ -11,6 +11,7 @@ library(tidyverse)
 library(here)
 library(RColorBrewer)
 library(extrafont)
+library(forcats)
 
 #Data
 err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_hcr30.csv"))
@@ -150,14 +151,14 @@ prop_bad100_c
 
 
 ##Try the other graph with the fill by type:
-prop_graph <- ggplot(graph_df, aes(x=error, y=prop)) + 
+prop_graph <- ggplot(graph_df, aes(x= fct_rev(error), y=prop)) + 
   geom_col(aes(fill = type), alpha = 0.7)+
   scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
   theme_light()+
   coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
   labs(title = "Error Assessments", x = "Error Amount", y = "Proportion Closed/Overfished")+
-  scale_x_discrete(labels=c("0.1" = "10%", "0.3" = "30%",
-                              "0.5" = "50%")) +
+  scale_x_discrete(labels=c("0.5" = "50%", "0.3" = "30%",
+                              "0.1" = "10%")) +
   theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
     legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
     legend.box.background = element_blank()) 
@@ -201,12 +202,14 @@ graph_both2$error <- as.factor(graph_both2$error)
 #Want to have error as a factor so that the graphs have a discrete x-axis:
 graph_both$error <- as.factor(graph_both$error)
 
-prop_100_both <- ggplot(graph_both, aes(x=error, y = prop, fill = productivity)) + 
+prop_100_both <- ggplot(graph_both, aes(x=fct_rev(error), y = prop, fill = productivity)) + 
   geom_col(position = "dodge", alpha = .7) +
   scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Fmsy \n(Productivity)", labels = c("Constant", "Updating"))+
   theme_light()+
   coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
   labs(title = "Error Assessments", x = "Error Amount (%)", y = "Proportion Closed/Overfished")+
+   scale_x_discrete(labels=c("0.5" = "50%", "0.3" = "30%",
+                              "0.1" = "10%")) +
   theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
     legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"),legend.background = element_blank(),
     legend.box.background = element_blank()) 

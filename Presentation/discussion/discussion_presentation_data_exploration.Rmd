@@ -1,15 +1,23 @@
 ---
-title: "discussion_pres_decisiontable"
+title: "discussion_presentation_data_exploration"
 author: "Chase Brewster"
 date: "1/23/2020"
 output: html_document
 ---
+
+This .Rmd holds every combination of expirements we have ran. It has all assessment intervals (0, 20, 15, 10, 5, every year), tested against all errors (.5, .3, .1), and all harvest control rules (.95 - .50), under the constant fmsy scenario.
+
+The resulting dataset - "alldata" - can then be altered independently to create different data explorations and visualizations.
+
+To explore data, follow the steps below:
+
+1. Packages Needed
 ```{r}
 library(tidyverse)
 library(here)
 ```
 
-
+2. Read in the csv files, add columns for data exploration grouping, and bind all csv's to the main data set, "alldata"
 
 ```{r}
 low_err <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_lowerr.csv"))
@@ -76,83 +84,103 @@ low_err_3 <- low_err_15 %>%
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "15")
 
 mid_err_3 <- mid_err_15 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "15")
 
 high_err_3 <- high_err_15 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "15")
 
 low_err_4 <- low_err_20 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "20")
 
 mid_err_4 <- mid_err_20 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "20")
 
 high_err_4 <- high_err_20 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "20")
 
 low_err_5 <- low_err_0 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "0")
 
 mid_err_5 <- mid_err_0 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "0")
 
 high_err_5 <- high_err_0 %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "0")
 
 low_err_6 <- low_err_all %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "all")
 
 mid_err_6 <- mid_err_all %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "all")
 
 high_err_6 <- high_err_all %>% 
   filter(year == 100) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(assess = "10")
+  mutate(assess = "all")
 
 
-decisiontable_all <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_err_2, low_err_3, mid_err_3, high_err_3, low_err_4, mid_err_4, high_err_4, low_err_5, mid_err_5, high_err_5, low_err_6, mid_err_6, high_err_6) %>%
-  group_by(error, growth, hcr) %>% 
+alldata <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_err_2, low_err_3, mid_err_3, high_err_3, low_err_4, mid_err_4, high_err_4, low_err_5, mid_err_5, high_err_5, low_err_6, mid_err_6, high_err_6)
+
+```
+
+3. From here, use the "alldata" dataset to explore different combinations. Always create a new dataframe for the specific exploration when using "alldata" to avoid writing over the main dataset.
+
+We will have to recategorize some variables as factors to properly group and graph.
+
+```{r}
+
+assess_error <- alldata %>% 
+  group_by(error, growth, assess) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  filter(b_0 == 1500) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed + over)/(good + closed + over)) %>% 
-  mutate(prop_closed = (closed)/(good + closed + over))
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+  
 
+assess_error$error <- as.factor(assess_error$error)
+assess_error$assess <- as.factor(assess_error$assess)
 
+decision_graph <- ggplot(assess_error, aes(x = assess, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge")
 
+decision_graph
 ```
+

@@ -4,7 +4,9 @@ author: "Chase Brewster"
 date: "1/23/2020"
 output: html_document
 ---
+#{.tabset}
 
+##Step 1
 This .Rmd holds every combination of expirements we have ran. It has all assessment intervals (0, 20, 15, 10, 5, every year), tested against all errors (.5, .3, .1), and all harvest control rules (.95 - .50), under the constant fmsy scenario.
 
 The resulting dataset - "alldata" - can then be altered independently to create different data explorations and visualizations.
@@ -12,14 +14,15 @@ The resulting dataset - "alldata" - can then be altered independently to create 
 To explore data, follow the steps below:
 
 1. Packages Needed
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(here)
 ```
 
+##Step 2
 2. Read in the csv files, add columns for data exploration grouping, and bind all csv's to the main data set, "alldata"
 
-```{r}
+```{r message = FALSE, warning = FALSE}
 low_err <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_lowerr.csv"))
 mid_err <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_miderr.csv"))
 high_err <- read_csv(file=file.path(here(),"/Presentation/discussion/decisiontable_higherr.csv"))
@@ -161,39 +164,143 @@ alldata <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_er
 
 ```
 
+
 3. From here, use the "alldata" dataset to explore different combinations. Always create a new dataframe for the specific exploration when using "alldata" to avoid writing over the main dataset.
 
 We will have to recategorize some variables as factors to properly group and graph.
 
+```{r read-alldata, warning = FALSE, message = FALSE}
+alldata <- read_csv("alldata.csv")
 
-Assessment Intervals & Error
-```{r}
+#Change the NA to "all"
+alldata[is.na(alldata)] <- "all" #turn NAs to all
+```
 
-assess_error <- alldata %>% 
+
+##Assessment + Error
+
+#Assessment Intervals & Error
+
+```{r assess-error-wrangle, include = FALSE, message = FALSE, warning = FALSE}
+
+###Moderate climate change
+#All biomasses, separated by growth rates:
+ae_mod_growth <- alldata %>% 
   group_by(error, growth, assess) %>%
   filter(r_s <= 0) %>%
   filter(r_s >= -0.00767) %>% 
-  filter(b_0 == 1500) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+
+#Factors:
+ae_mod_growth$error <- as.factor(ae_mod_growth$error)
+ae_mod_growth$assess <- as.factor(ae_mod_growth$assess)
+
+#All biomasses, separated by initial biomass:
+ae_mod_b0 <- alldata %>% 
+  group_by(error, b_0, assess) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
   mutate(prop_closed = (closed)/(good + over + closed))
-  
 
-assess_error$error <- as.factor(assess_error$error)
-assess_error$assess <- as.factor(assess_error$assess)
+#Factors:
+ae_mod_b0$error <- as.factor(ae_mod_b0$error)
+ae_mod_b0$assess <- as.factor(ae_mod_b0$assess)
 
-assess_error_graph <- ggplot(assess_error, aes(x = assess, y = prop_bad, fill = error))  + 
-  geom_col(position = "dodge")
+##Severe climate change
+#All biomasses, separated by growth rates:  
+ae_severe_growth <- alldata %>% 
+  group_by(error, growth, assess) %>%
+  filter(r_s < -0.00767) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>%
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
 
-assess_error_graph
+#Factors:
+ae_severe_growth$error <- as.factor(ae_severe_growth$error)
+ae_severe_growth$assess <- as.factor(ae_severe_growth$assess)
+
+#All biomasses, separated by initial biomass:  
+ae_severe_b0 <- alldata %>% 
+  group_by(error, b_0, assess) %>%
+  filter(r_s < -0.00767) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>%
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+
+#Factors: 
+ae_severe_b0$error <- as.factor(ae_severe_b0$error)
+ae_severe_b0$assess <- as.factor(ae_severe_b0$assess)
+
 ```
 
-Error & Harvest Control Rules
-```{r}
+###Graphs:  
+Moderate climate change - facet wrap by growth rates:   
+```{r echo = FALSE, message = FALSE}
+ae_mod_growth_graph <- ggplot(ae_mod_growth, aes(x = assess, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
 
-hcr_error <- alldata %>% 
+ae_mod_growth_graph
+```
+
+
+Severe climate change - facet wrap by growth rates:  
+```{r echo = FALSE, message = FALSE}
+ae_severe_growth_graph <- ggplot(ae_severe_growth, aes(x = assess, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ae_severe_growth_graph
+```
+
+
+
+Moderate climate change - facet wrap by initial biomass:  
+```{r echo = FALSE, message = FALSE}
+ae_mod_b0_graph <- ggplot(ae_mod_b0, aes(x = assess, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ae_mod_b0_graph
+```
+
+
+Severe climate change - facet wrap by initial biomass:  
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+ae_severe_b0_graph <- ggplot(ae_severe_b0, aes(x = assess, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ae_severe_b0_graph
+```
+
+I would like to also show the moderate and severe climate change facet wrap by HCR  
+
+
+##Error + HCRs
+
+#Error & Harvest Control Rules
+
+```{r error-hcr-wrangle, include = FALSE, message = FALSE, warning = FALSE}
+
+###Moderate climate change
+#All biomasses, separated by growth rates:
+ehcr_mod_growth <- alldata %>% 
   group_by(error, growth, hcr) %>%
   filter(r_s <= 0) %>%
   filter(r_s >= -0.00767) %>% 
@@ -202,48 +309,267 @@ hcr_error <- alldata %>%
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
-  mutate(prop_closed = (closed)/(good + over + closed))
-  
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed))
 
-hcr_error$error <- as.factor(hcr_error$error)
+#Factors:
+ehcr_mod_growth$error <- as.factor(ehcr_mod_growth$error)
+ehcr_mod_growth$hcr <- as.factor(ehcr_mod_growth$hcr)
 
-hcr_error_graph <- ggplot(hcr_error, aes(x = hcr, y = prop_bad, fill = error))  + 
-  geom_col(position = "dodge") +
-  scale_x_reverse() 
-
-hcr_error_graph
-```
-
-Harvest Control Rules & Assessment Intervals
-```{r}
-
-hcr_assess <- alldata %>% 
-  group_by(assess, growth, hcr) %>%
+#All biomasses, separated by initial biomass:
+ehcr_mod_b0 <- alldata %>% 
+  group_by(error, b_0, hcr) %>%
   filter(r_s <= 0) %>%
   filter(r_s >= -0.00767) %>% 
   filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
-  filter(error == 0.3 | error == 0.1) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
   mutate(prop_closed = (closed)/(good + over + closed)) %>% 
-  mutate(prop_over = (over)/(good + over))
-  
+  mutate(prop_over = over / (good + over + closed))
 
-hcr_assess$assess<- as.factor(hcr_assess$assess)
-hcr_assess$hcr <- as.factor(hcr_assess$hcr)
+#Factors:
+ehcr_mod_b0$error <- as.factor(ehcr_mod_b0$error)
+ehcr_mod_b0$hcr <- as.factor(ehcr_mod_b0$hcr)
 
-hcr_assess_graph <- ggplot(hcr_assess, aes(x = assess, y = prop_bad, fill = hcr))  + 
-  geom_col(position = "dodge") 
+##Severe climate change
+#All biomasses, separated by growth rates:  
+ehcr_severe_growth <- alldata %>% 
+  group_by(error, growth, hcr) %>%
+  filter(r_s < -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>%
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) 
 
-hcr_assess_graph
+#Factors:
+ehcr_severe_growth$error <- as.factor(ehcr_severe_growth$error)
+ehcr_severe_growth$hcr <- as.factor(ehcr_severe_growth$hcr)
+
+#All biomasses, separated by initial biomass:  
+ehcr_severe_b0 <- alldata %>% 
+  group_by(error, b_0, hcr) %>%
+  filter(r_s < -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>%
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+
+#Factors: 
+ehcr_severe_b0$error <- as.factor(ehcr_severe_b0$error)
+ehcr_severe_b0$hcr <- as.factor(ehcr_severe_b0$hcr)
+
+```
+
+
+###Graphs:  
+Moderate climate change - facet wrap by growth rates:   
+```{r echo = FALSE, message = FALSE}
+ehcr_mod_growth_graph <- ggplot(ehcr_mod_growth, aes(x = hcr, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ehcr_mod_growth_graph
+```
+
+
+Severe climate change - facet wrap by growth rates:  
+```{r echo = FALSE, message = FALSE}
+ehcr_severe_growth_graph <- ggplot(ehcr_severe_growth, aes(x = hcr, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ehcr_severe_growth_graph
 ```
 
 
 
+Moderate climate change - facet wrap by initial biomass:  
+```{r echo = FALSE, message = FALSE}
+ehcr_mod_b0_graph <- ggplot(ehcr_mod_b0, aes(x = hcr, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ehcr_mod_b0_graph
+```
 
 
+Severe climate change - facet wrap by initial biomass:  
+```{r echo = FALSE, message = FALSE, warning = FALSE}
+ehcr_severe_b0_graph <- ggplot(ehcr_severe_b0, aes(x = hcr, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ehcr_severe_b0_graph
+```
+
+
+I would like to also show the moderate and severe climate change facet wrap by assessment interval
+
+
+##HCRs + Assess
+
+#Harvest Control Rules & Assessment Intervals
+
+
+```{r hcr-assess-wrangle, include = FALSE, message = FALSE, warning = FALSE}
+
+###Moderate climate change
+#All biomasses, separated by growth rates:
+ahcr_mod_growth <- alldata %>% 
+  group_by(assess, growth, hcr) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed))
+
+#Factors:
+ahcr_mod_growth$assess <- as.factor(ahcr_mod_growth$assess)
+ahcr_mod_growth$hcr <- as.factor(ahcr_mod_growth$hcr)
+
+#All biomasses, separated by initial biomass:
+ahcr_mod_b0 <- alldata %>% 
+  group_by(assess, b_0, hcr) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed))
+
+#Factors:
+ahcr_mod_b0$assess <- as.factor(ahcr_mod_b0$assess)
+ahcr_mod_b0$hcr <- as.factor(ahcr_mod_b0$hcr)
+
+##Severe climate change
+#All biomasses, separated by growth rates:  
+ahcr_severe_growth <- alldata %>% 
+  group_by(assess, growth, hcr) %>%
+  filter(r_s < -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>%
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) 
+
+#Factors:
+ahcr_severe_growth$assess <- as.factor(ahcr_severe_growth$assess)
+ahcr_severe_growth$hcr <- as.factor(ahcr_severe_growth$hcr)
+
+#All biomasses, separated by initial biomass:  
+ahcr_severe_b0 <- alldata %>% 
+  group_by(assess, b_0, hcr) %>%
+  filter(r_s < -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>%
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+
+#Factors: 
+ahcr_severe_b0$assess <- as.factor(ahcr_severe_b0$assess)
+ahcr_severe_b0$hcr <- as.factor(ahcr_severe_b0$hcr)
+
+```
+
+
+#Graphs:  
+
+Moderate climate change - facet wrap by growth rates:  
+```{r echo = FALSE, message = FALSE}
+#fill by HCR:
+ahcr_mod_growth_graph <- ggplot(ahcr_mod_growth, aes(x = assess, y = prop_bad, fill = hcr))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ahcr_mod_growth_graph
+
+#Opposite - fill by assessment interval:
+ahcr_mod_growth_graph2 <- ggplot(ahcr_mod_growth, aes(x = hcr, y = prop_bad, fill = assess))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ahcr_mod_growth_graph2
+```
+
+
+
+Severe climate change - facet wrap by growth rates:    
+```{r echo = FALSE, message = FALSE}
+#fill by HCR:
+ahcr_severe_growth_graph <- ggplot(ahcr_severe_growth, aes(x = assess, y = prop_bad, fill = hcr))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ahcr_severe_growth_graph
+
+#Opposite - fill by assessment interval:
+ahcr_severe_growth_graph2 <- ggplot(ahcr_severe_growth, aes(x = hcr, y = prop_bad, fill = assess))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~growth)
+
+ahcr_severe_growth_graph2
+```
+
+
+
+Moderate climate change - facet wrap by initial biomass:  
+```{r echo = FALSE, message = FALSE}
+#fill by HCR:
+ahcr_mod_b0_graph <- ggplot(ahcr_mod_b0, aes(x = assess, y = prop_bad, fill = hcr))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ahcr_mod_b0_graph
+
+#Opposite - fill by assessment interval:
+ahcr_mod_b0_graph2 <- ggplot(ahcr_mod_b0, aes(x = hcr, y = prop_bad, fill = assess))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ahcr_mod_b0_graph2
+```
+
+
+
+Severe climate change facet wrap by initial biomass:  
+```{r echo = FALSE, message = FALSE}
+#fill by HCR:
+ahcr_severe_b0_graph <- ggplot(ahcr_severe_b0, aes(x = assess, y = prop_bad, fill = hcr))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ahcr_severe_b0_graph
+
+#Opposite - fill by assessment interval:
+ahcr_severe_b0_graph2 <- ggplot(ahcr_severe_b0, aes(x = hcr, y = prop_bad, fill = assess))  + 
+  geom_col(position = "dodge") + 
+  facet_wrap(~b_0)
+
+ahcr_severe_b0_graph2
+```
+
+
+I would like to also show the moderate and severe climate change facet wrap by error
 
 ##Gracie Exploration 
 ```{r}

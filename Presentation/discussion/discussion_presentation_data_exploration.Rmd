@@ -240,3 +240,40 @@ hcr_assess_graph <- ggplot(hcr_assess, aes(x = assess, y = prop_bad, fill = hcr)
 hcr_assess_graph
 ```
 
+
+
+
+
+
+##Gracie Exploration 
+```{r}
+
+
+gracie_alldata <- alldata %>% 
+  group_by(assess, growth, hcr, error) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = (over)/(good + over))
+
+
+gracie_alldata$assess <- as.numeric(gracie_alldata$assess)
+gracie_alldata$hcr <- as.numeric(gracie_alldata$hcr)
+
+bin_plot <- ggplot(gracie_alldata, aes(x=hcr, y = prop_bad))+
+  geom_bin2d()
+bin_plot
+
+#sort of cool but not that helpful 
+density_plot <- ggplot(gracie_alldata, aes(y = prop_bad, x = hcr)) +
+  geom_point() +
+  stat_density_2d(aes(fill = ..level..), geom="polygon") 
+
+density_plot
+
+```
+

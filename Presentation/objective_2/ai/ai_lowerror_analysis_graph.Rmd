@@ -102,6 +102,7 @@ Want to show all the runs together and then also break out only the starting bio
 ai_graph_1500 <- ggplot(ai_lowerror, aes(x = assess_int, y = prop_bad)) +
   geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +
   theme_light()+
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
   coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
   labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
   theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
@@ -116,9 +117,17 @@ ai_graph_1500
 
 ##Stacked columns for 1500 biomass:
 ai_graph_stack <- ggplot(graph_df, aes(x= assess_int, y = prop)) +
-  geom_col(aes(fill = type), alpha = .7)
+  geom_col(aes(fill = type), alpha = .7)+
+  theme_light()+
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
+    legend.box.background = element_blank())
 ai_graph_stack
-
+ggsave(ai_graph_stack, filename = "assessment1.png",  bg = "transparent")
 ```
 
 
@@ -236,11 +245,10 @@ ai_1500_both <- ggplot(graph_both1500, aes(x = assessment_interval, y = prop_bad
   labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
   theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
     legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
-    legend.box.background = element_blank()) +
-  geom_text(aes(label = round(prop_bad, digits = 2)), position = position_dodge(0.8), vjust = 2, size = 3.5)
+    legend.box.background = element_blank()) 
 
 ai_1500_both
-#ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
+ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
 
 ai_all_both <- ggplot(graph_both_all, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
   geom_col(position = "dodge")

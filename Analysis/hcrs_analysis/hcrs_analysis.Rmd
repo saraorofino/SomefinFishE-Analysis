@@ -12,6 +12,7 @@ output: html_document
 #Packages
 library(tidyverse)
 library(here)
+library(viridis)
 
 #Data
 hcr_rep5c <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_constantfmsy_5rep.csv"))

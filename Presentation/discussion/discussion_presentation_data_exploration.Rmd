@@ -155,6 +155,10 @@ high_err_6 <- high_err_all %>%
 
 alldata <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_err_2, low_err_3, mid_err_3, high_err_3, low_err_4, mid_err_4, high_err_4, low_err_5, mid_err_5, high_err_5, low_err_6, mid_err_6, high_err_6)
 
+#Write as CSV:
+#write.csv(alldata, file=file.path(here(),"/Presentation/discussion/alldata.csv"),
+#           row.names = FALSE)
+
 ```
 
 3. From here, use the "alldata" dataset to explore different combinations. Always create a new dataframe for the specific exploration when using "alldata" to avoid writing over the main dataset.

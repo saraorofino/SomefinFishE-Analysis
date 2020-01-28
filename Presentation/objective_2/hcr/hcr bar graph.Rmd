@@ -71,6 +71,8 @@ rep_c <- rbind(rep5c, rep10c) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_closed = closed / (good + closed + over)) %>% 
+  mutate(prop_over = over / (good + closed + over)) %>% 
   mutate(prop_bad = (closed + over)/(good + closed + over))
 
 rep_u <- rbind(rep5u, rep10u) %>% 
@@ -79,6 +81,11 @@ rep_u <- rbind(rep5u, rep10u) %>%
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(prop_bad = (closed + over)/(good + closed + over))
+
+#Create the df for stacked graph:
+over_c <- data.frame(hcr = rep_c$hcr, type = rep("over", 10), prop = rep_c$prop_over)
+closed_c <- data.frame(hcr = rep_c$hcr, type = rep("closed", 10), prop = rep_c$prop_closed)
+rep_c_stacked <- rbind(over_c, closed_c)
 
 ```
 
@@ -127,7 +134,7 @@ hcr_bar_both_c <- ggplot(rep_c, aes(x = hcr, y = prop_bad)) +
   
 hcr_bar_both_c
 
-ggsave(hcr_bar_both_c, filename = "hcr_constant.png",  bg = "transparent")
+#ggsave(hcr_bar_both_c, filename = "hcr_constant.png",  bg = "transparent")
 
 hcr_bar_u <- ggplot(rep_u, aes(x = hcr, y = prop_bad)) +
   geom_col(aes(fill = hcr)) +
@@ -171,6 +178,13 @@ hcr_bar_both <- ggplot(rep_both, aes(x = hcr, y = prop_bad)) +
   ) 
   
   hcr_bar_both
-ggsave(hcr_bar_both, filename = "hcr_both.png",  bg = "transparent")
+#ggsave(hcr_bar_both, filename = "hcr_both.png",  bg = "transparent")
+```
+
+New HCR graph showing the proportion overfished vs. closed for constant fmsy:  
+```{r stacked-constant-graph}
+hcr_stacked_c <- ggplot(rep_c_stacked, aes(x = hcr, y = prop)) +
+  geom_col(aes(fill = type), alpha = .7)
+hcr_stacked_c
 ```
 

@@ -209,7 +209,7 @@ hcr_error$error <- as.factor(hcr_error$error)
 
 hcr_error_graph <- ggplot(hcr_error, aes(x = hcr, y = prop_bad, fill = error))  + 
   geom_col(position = "dodge") +
-  scale_x_reverse()
+  scale_x_reverse() 
 
 hcr_error_graph
 ```
@@ -235,7 +235,7 @@ hcr_assess$assess<- as.factor(hcr_assess$assess)
 hcr_assess$hcr <- as.factor(hcr_assess$hcr)
 
 hcr_assess_graph <- ggplot(hcr_assess, aes(x = assess, y = prop_bad, fill = hcr))  + 
-  geom_col(position = "dodge")
+  geom_col(position = "dodge") 
 
 hcr_assess_graph
 ```

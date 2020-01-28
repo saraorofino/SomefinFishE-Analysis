@@ -193,7 +193,7 @@ hcr_error <- alldata %>%
   group_by(error, growth, hcr) %>%
   filter(r_s <= 0) %>%
   filter(r_s >= -0.00767) %>% 
-  filter(b_0 == 1500) %>%
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
@@ -208,5 +208,31 @@ hcr_error_graph <- ggplot(hcr_error, aes(x = hcr, y = prop_bad, fill = error))  
   geom_col(position = "dodge")
 
 hcr_error_graph
+```
+
+Harvest Control Rules & Assessment Intervals
+```{r}
+
+hcr_assess <- alldata %>% 
+  group_by(assess, growth, hcr) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  filter(hcr == 0.9 | hcr == 0.8 | hcr == 0.7 | hcr == 0.6 | hcr == 0.5) %>%
+  filter(error == 0.3 | error == 0.1) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = (over)/(good + over))
+  
+
+hcr_assess$assess<- as.factor(hcr_assess$assess)
+hcr_assess$hcr <- as.factor(hcr_assess$hcr)
+
+hcr_assess_graph <- ggplot(hcr_assess, aes(x = assess, y = prop_bad, fill = hcr))  + 
+  geom_col(position = "dodge")
+
+hcr_assess_graph
 ```
 

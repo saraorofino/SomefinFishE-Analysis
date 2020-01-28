@@ -202,10 +202,10 @@ hcr_error <- alldata %>%
   
 
 hcr_error$error <- as.factor(hcr_error$error)
-hcr_error$hcr <- as.factor(hcr_error$hcr)
 
 hcr_error_graph <- ggplot(hcr_error, aes(x = hcr, y = prop_bad, fill = error))  + 
-  geom_col(position = "dodge")
+  geom_col(position = "dodge") +
+  scale_x_reverse()
 
 hcr_error_graph
 ```

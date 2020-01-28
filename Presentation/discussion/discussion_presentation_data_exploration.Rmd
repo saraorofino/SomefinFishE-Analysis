@@ -161,6 +161,8 @@ alldata <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_er
 
 We will have to recategorize some variables as factors to properly group and graph.
 
+
+Assessment Intervals & Error
 ```{r}
 
 assess_error <- alldata %>% 
@@ -178,9 +180,33 @@ assess_error <- alldata %>%
 assess_error$error <- as.factor(assess_error$error)
 assess_error$assess <- as.factor(assess_error$assess)
 
-decision_graph <- ggplot(assess_error, aes(x = assess, y = prop_bad, fill = error))  + 
+assess_error_graph <- ggplot(assess_error, aes(x = assess, y = prop_bad, fill = error))  + 
   geom_col(position = "dodge")
 
-decision_graph
+assess_error_graph
+```
+
+Error & Harvest Control Rules
+```{r}
+
+hcr_error <- alldata %>% 
+  group_by(error, growth, hcr) %>%
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  filter(b_0 == 1500) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+  
+
+hcr_error$error <- as.factor(hcr_error$error)
+hcr_error$hcr <- as.factor(hcr_error$hcr)
+
+hcr_error_graph <- ggplot(hcr_error, aes(x = hcr, y = prop_bad, fill = error))  + 
+  geom_col(position = "dodge")
+
+hcr_error_graph
 ```
 

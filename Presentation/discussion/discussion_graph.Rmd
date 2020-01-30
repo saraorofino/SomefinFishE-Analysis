@@ -1,0 +1,110 @@
+---
+title: "discussion_graph"
+output: html_document
+---
+
+#{.tabset}
+
+##Setup
+
+```{r include = FALSE, warning=FALSE, message = FALSE}
+library(tidyverse)
+
+alldata <- read_csv("alldata.csv")
+
+```
+
+
+##Data Wrangling
+
+After exploration we are highlighting the following scenarios:  
+
+Initial conditions:  
+climate = Moderate (-0.00767 - 0)  
+Assessment = 10 years  
+
+Combinations:  
+
+1. Error = 0.5 and HCR = 0.5  
+2. Error = 0.3 and HCR = 0.8  
+3. Error = 0.1 and HCR = 0.95  
+
+
+```{r include = FALSE}
+#Create the baseline conditions df:
+baseline <- alldata %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(year == 100) %>% 
+  filter(assess == "10")
+
+
+#Scenario 1
+scen1 <- baseline %>% 
+  filter(error == 0.5) %>% 
+  filter(hcr == 0.5) %>% 
+  group_by(error, hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed)/(good + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + closed)) %>% 
+  mutate(prop_over = 0)
+
+#Scenario 2
+scen2 <- baseline %>% 
+  filter(error == 0.3) %>% 
+  filter(hcr == 0.8) %>% 
+  group_by(error, hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed))
+
+#Scenario 3
+scen3 <- baseline %>% 
+  filter(error == 0.1) %>% 
+  filter(hcr == 0.95) %>% 
+  group_by(error, hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed))
+
+
+#Create the graphing data frame:
+scenario <- c("1", "2", "3")
+prop_bad <- c(scen1$prop_bad, scen2$prop_bad, scen3$prop_bad)
+type <- c("over", "closed", "over", "closed", "over", "closed")
+prop <- c(scen1$prop_over, scen1$prop_closed, scen2$prop_over, scen2$prop_closed, scen3$prop_over, scen3$prop_closed)
+
+scen_combined <- data.frame(scenario = scenario, prop_bad = prop_bad)
+scen_stacked <- data.frame(scenario = c("1", "1", "2", "2", "3", "3"), type = type, prop = prop)
+
+```
+
+
+##Graphs:
+
+Graph just the prop_bad for each scenario: 
+```{r echo=FALSE}
+
+scen_graph <- ggplot(scen_combined, aes(x = scenario, y = prop_bad)) + 
+  geom_col()
+scen_graph
+```
+
+Graph stacked by over/closed proportions:  
+```{r echo = FALSE}
+
+scen_stack_graph <- ggplot(scen_stacked, aes(x = scenario, y = prop, fill = type)) +
+  geom_col()
+
+scen_stack_graph
+
+```
+

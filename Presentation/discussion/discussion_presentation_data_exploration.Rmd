@@ -780,3 +780,20 @@ Starting at 0.5 error, with no management (no reassess period, no hcr) - adding 
 Once at 0.3 error, then there starts being some comparable trade offs between upping the assessment intervals vs. hcrs. vs getting down to 0.1 error. A 0.7 hcr at 0.3 error seems like the point thats better than a 0.5 error with a 0.5 hcr. The assessment intervals get a little bit better but not super significant relatively.
 
 Getting down to 0.1 error can be better than the rest even with a 0.9 hcr. But closing that .3 - .1 gap may be harder to do than the .5 - .3 gap. A 0.7 hcr might be easier to put in rather than getting error down  to 0.1 but  who knows.
+
+```{r}
+alldata_counts <- alldata %>% 
+  group_by(error, hcr) %>%
+  filter(assess != "0") %>% 
+  filter(growth == "slow") %>% 
+  filter(b_0 == 1500) %>% 
+  filter(r_s <= 0) %>%
+  filter(r_s >= -0.00767) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed)) %>% 
+  mutate(prop_over = over / (good + over + closed)) %>% 
+  mutate(prop_closed = (closed)/(good + over + closed))
+```
+

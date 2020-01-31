@@ -1,0 +1,116 @@
+---
+title: "discussion_data_run4"
+author: "Sara Orofino"
+date: "1/31/2020"
+output: html_document
+---
+
+##Run 4
+
+Read in the csv files, add columns for data exploration grouping, and bind all csv's to the main data set, "alldata_run4"
+```{r}
+library(tidyverse)
+library(here)
+```
+
+
+```{r message = FALSE, warning = FALSE}
+low_err_5 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run4/lowerr_5_run4.csv"))
+mid_err_5 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run4/miderr_5_run4.csv"))
+high_err_5 <- read_csv(file=file.path(here(),"/Results/discussion_runs/higherror/run4/higherr_5_run4.csv"))
+
+low_err_10 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run4/lowerr_10_run4.csv"))
+mid_err_10 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run4/miderr_10_run4.csv"))
+high_err_10 <- read_csv(file=file.path(here(),"/Results/discussion_runs/higherror/run4/higherr_10_run4.csv"))
+
+low_err_15 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run4/lowerr_15_run4.csv"))
+mid_err_15 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run4/miderr_15_run4.csv"))
+high_err_15 <- read_csv(file=file.path(here(),"/Results/discussion_runs/higherror/run4/higherr_15_run4.csv"))
+
+low_err_20 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run4/lowerr_20_run4.csv"))
+mid_err_20 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run4/miderr_20_run4.csv"))
+high_err_20 <- read_csv(file=file.path(here(),"/Results/discussion_runs/higherror/run4/higherr_20_run4.csv"))
+
+
+low_err_1 <- low_err_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "5")
+
+mid_err_1 <- mid_err_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "5")
+
+high_err_1 <- high_err_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "5")
+  
+low_err_2 <- low_err_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+mid_err_2 <- mid_err_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+high_err_2 <- high_err_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+  
+low_err_3 <- low_err_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "15")
+
+mid_err_3 <- mid_err_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "15")
+
+high_err_3 <- high_err_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "15")
+
+low_err_4 <- low_err_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "20")
+
+mid_err_4 <- mid_err_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "20")
+
+high_err_4 <- high_err_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "20")
+
+
+alldata_run4 <- rbind(low_err_1, mid_err_1, high_err_1, low_err_2, mid_err_2, high_err_2, low_err_3, mid_err_3, high_err_3, low_err_4,
+                      mid_err_4, high_err_4)
+
+#Write as CSV:
+# library(here)
+# write.csv(alldata_run4, file=file.path(here(),"/Analysis/discussion_analysis/analysis_data/alldata_run4.csv"),
+#           row.names = FALSE)
+
+```

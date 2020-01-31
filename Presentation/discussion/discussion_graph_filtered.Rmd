@@ -118,9 +118,27 @@ Graph of just scenarios and proportion of bad outcomes:
 ```{r echo=FALSE}
 
 scen_graph <- ggplot(scen_combined, aes(x = scenario, y = prop_bad)) + 
-  geom_col()
+  geom_col(aes(fill = type), alpha = 0.7, width = .6, fill = "#079EDF")+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.25), expand = FALSE ) +
+  labs(title = "Trade-Offs", subtitle = "A slow-growing species with low initial biomass", x = "Scenario", y = "Proportion of Failures")+
+  scale_x_discrete(labels=c("1" = "Error: 30%\nHCR: 35%\nYears: 10", "2" = "Error: 30%\nHCR: 30%\nYears: 5","3" = "Error: 10%\nHCR: 10%\nYears: 20", "4" = "Error: 10%\nHCR: 5%\nYears: 5")) +
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), plot.subtitle = element_text(hjust = 0.5, size = 17, face="italic"), axis.title.x = element_text(face = "bold", size = 15, vjust = -.5), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank())
 
 scen_graph
+
+ggsave(scen_graph, filename = "scen_specific.png",  bg = "transparent")
+
+#climate = Moderate (-0.00767 - 0)  
+#B0 = 1500  
+#Growth = slow  
+
+#1. Error = 0.3 and HCR = 0.65 and Assess = 10  
+#2. Error = 0.3 and HCR = 0.7 and Assess = 5    
+#3. Error = 0.1 and HCR = 0.9 and Assess = 20  
+#4. Error = 0.1 and HCR = 0.95 and Assess = 5  
 ```
 
 Graph of over/closed proportions:  

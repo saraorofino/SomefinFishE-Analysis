@@ -783,10 +783,9 @@ Getting down to 0.1 error can be better than the rest even with a 0.9 hcr. But c
 
 ```{r}
 alldata_counts <- alldata %>% 
-  group_by(error, hcr) %>%
-  filter(assess != "0") %>% 
-  filter(growth == "slow") %>% 
+  group_by(error, hcr, assess) %>%
   filter(b_0 == 1500) %>% 
+  filter(growth == "slow") %>% 
   filter(r_s <= 0) %>%
   filter(r_s >= -0.00767) %>% 
   count(status) %>% 

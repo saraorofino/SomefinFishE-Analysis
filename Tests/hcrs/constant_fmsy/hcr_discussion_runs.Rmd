@@ -17,7 +17,7 @@ Note: Define the assessment interval and run at 0.5 error four times (change fil
 ```{r setup}
 
 #create an interval vector for times that we do want to do the assessment:
-assess_int <- seq(5,100,5)
+assess_int <- seq(10,100,10)
 
 #Write a "not contained in" function"
 `%not_in%` <- purrr::negate(`%in%`)
@@ -218,7 +218,7 @@ colnames(results_hcr) <- col_names
 
 #Write as CSV:
 library(here)
- write.csv(results_hcr, file=file.path(here(),"/Results/discussion_runs/lowerror/run5/lowerr_5_run5.csv"),
+ write.csv(results_hcr, file=file.path(here(),"/Results/discussion_runs/lowerror/run5/lowerr_10_run5.csv"),
            row.names = FALSE)
 
 ```

@@ -1,0 +1,26 @@
+---
+title: "discussion_data_combine"
+author: "Sara Orofino"
+date: "1/31/2020"
+output: html_document
+---
+
+Combine all the alldata sets from the different runs into one large dataset for analysis and graphing  
+
+```{r}
+library(tidyverse)
+
+run1 <- read_csv(file=file.path(here(),"/Presentation/discussion/alldata.csv"))
+run2 <- read_csv(file=file.path(here(),"/Analysis/discussion_analysis/analysis_data/alldata_run2.csv"))
+run3 <- read_csv(file=file.path(here(),"/Analysis/discussion_analysis/analysis_data/alldata_run3.csv"))
+run4 <- read_csv(file=file.path(here(),"/Analysis/discussion_analysis/analysis_data/alldata_run4.csv"))
+run5 <- read_csv(file=file.path(here(),"/Analysis/discussion_analysis/analysis_data/alldata_run5.csv"))
+
+alldata_combined <- rbind(run1, run2, run3, run4, run5)
+
+#Write CSV:
+library(here)
+write.csv(alldata_combined, file=file.path(here(),"/Presentation/discussion/alldata_combined.csv"),
+          row.names = FALSE)
+```
+

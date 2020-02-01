@@ -1,0 +1,219 @@
+---
+title: "flowchart_data"
+author: "Sara Orofino"
+date: "1/31/2020"
+output: html_document
+---
+
+##Setup
+```{r}
+library(tidyverse)
+library(here)
+
+alldata <- read_csv("alldata_combined.csv")
+```
+
+##Flowchart Calculations
+
+Calculations to support the flow chart for the discussion.   
+
+Start with the baseline proportion of bad outcomes for a fishery that is slow growing (growth = slow), depleted (b_0 = 1500), with no management (never reassess), no data (error = 0.5), in moderate negative climate change (-0.00767 - 0).
+
+```{r}
+#Create the baseline that holds for the whole simulation (growth, b_0, and climate change)
+baseline <- alldata %>% 
+  filter(b_0 == 1500) %>% 
+  filter(growth == "slow") %>%
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767)
+
+initial <- baseline %>% 
+  filter(assess == 0) %>% 
+  filter(error == 0.5) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (over)/(good + over)) 
+
+#Probably wouldn't be any HCRs if there was no management so just use the prop_bad from 5%
+initial_prop <- 0.75
+```
+
+
+Institute a 5% HCR and reassess every 20 years  
+```{r}
+step1 <- baseline %>% 
+  filter(assess == 20) %>% 
+  filter(error == 0.5) %>% 
+  filter(hcr == 0.95) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (over + closed)/(good + over + closed)) 
+  
+```
+
+
+Then you have some options:  
+
+- Reduce error to 0.3 (still assess every 20 years with 5% HCR)  
+- Increase cutback to 15% (still have 0.5 error and 20 year assessment)  
+- Increase frequency of assessment to 10 years (still have 0.5 error and 5% HCR)  
+
+```{r}
+#Step2 - get more data:
+err2 <- baseline %>%
+  filter(assess == 20) %>% 
+  filter(error == 0.3) %>% 
+  filter(hcr == 0.95) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (over + closed)/(good + over + closed))   
+
+#Step2 - increase cutback:
+hcr2 <- baseline %>%
+  filter(assess == 20) %>% 
+  filter(error == 0.5) %>% 
+  filter(hcr == 0.85) %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (over + closed)/(good + over + closed))
+
+#Step2 - increase frequency:  
+assess2 <- baseline %>%
+  filter(assess == 10) %>% 
+  filter(error == 0.5) %>% 
+  filter(hcr == 0.95) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (over + closed)/(over + closed))  #no good, only closed and over...
+```
+
+This shows that increasing the cutback is the best option. From there -   
+
+More options: 
+- Collect more data to get to 0.3 (still assess every 20 years with 15% HCR)
+- Increase cutback to 20% (still have 0.5 error and 20 year assessment)  
+- Reassess more to 10 years (still have 0.5 error and 15% HCR)  
+
+```{r}
+#Step3 - more data:
+err3 <- baseline %>%
+  filter(assess == 20) %>% 
+  filter(error == 0.3) %>% 
+  filter(hcr == 0.85) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed + over) / (closed + over + good))
+
+#Step3 - increase cutback:
+hcr3 <- baseline %>%
+  filter(assess == 20) %>% 
+  filter(error == 0.5) %>% 
+  filter(hcr == 0.80) %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+#Step3 - increase frequency:
+assess3 <- baseline %>%
+  filter(assess == 10) %>% 
+  filter(error == 0.5) %>% 
+  filter(hcr == 0.85) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed)) 
+```
+
+This shows that decreasing error is the best option. From there -   
+
+Single options:  
+- Increase cutback to 25% (stil have 0.3 error and 20 year assessment)  
+- Increase frequency to 10 years (still have 15% HCR and error = 0.3)  
+
+Combination options:  
+- Increase frequency a little (assess = 15 years) + increase cutback a lot (30%)  
+- Increase frequency a lot (assess = 5 years) + increase cutback a little (25%)  
+- More data (error = 0.1) + smaller increase in fishing (hcr = 0.90) and assessment stays the same (20 years)  
+- More data (error = 0.1) + more frequent (assess = 5 years) + increase fishing (hcr = 0.95)  
+
+```{r}
+#Step4 Single options
+
+#Step4 - more data:
+err4 <- baseline %>%
+  filter(error == 0.1) %>% 
+  filter(assess == 20) %>% 
+  filter(hcr == 0.85) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") #all good 
+
+#Step4 - increase cutback:
+hcr4 <- baseline %>%
+  filter(assess == 20) %>% 
+  filter(error == 0.3) %>% 
+  filter(hcr == 0.75) %>%
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+#Step4 - increase frequency: 
+assess4 <- baseline %>%
+  filter(assess == 10) %>% 
+  filter(error == 0.3) %>% 
+  filter(hcr == 0.85) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed)) 
+
+#Step4 - combo 1 increase frequency a little and cutback a lot: 
+combo1 <- baseline %>%
+  filter(error == 0.3) %>% 
+  filter(assess == 15) %>% 
+  filter(hcr == 0.70) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+#Step4 - combo 2 increase frequency and cutback a lot: 
+combo2 <- baseline %>%
+  filter(error == 0.3) %>% 
+  filter(assess == 5) %>% 
+  filter(hcr == 0.75) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+
+#Step4 - combo 3 data + increase fishing a little:
+combo3 <- baseline %>%
+  filter(error == 0.1) %>% 
+  filter(assess == 20) %>% 
+  filter(hcr == 0.90) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed + over)/(good + over + closed))
+
+#Step4 - combo 4 data + frequency + increase fishing more:
+combo4 <- baseline %>%
+  filter(error == 0.1) %>% 
+  filter(assess == 10) %>% 
+  filter(hcr == 0.90) %>% 
+  group_by(hcr) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(prop_bad = (closed)/(good + closed))
+```
+

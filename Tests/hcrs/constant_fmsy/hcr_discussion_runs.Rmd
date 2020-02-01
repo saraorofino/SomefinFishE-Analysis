@@ -17,7 +17,7 @@ Note: Define the assessment interval and run at 0.5 error four times (change fil
 ```{r setup}
 
 #create an interval vector for times that we do want to do the assessment:
-assess_int <- seq(20,100,20)
+assess_int <- c(1)
 
 #Write a "not contained in" function"
 `%not_in%` <- purrr::negate(`%in%`)
@@ -138,6 +138,8 @@ sim_hcr <- function(b, r, r_s, error, p, k, years, hcr){ #hcr term is added into
 
 ```
 
+
+
 ##Model Check
 
 Simple results check:
@@ -156,7 +158,7 @@ list_hcr <- list(
   b = c(1500, 4000, 6000),
   r = seq(0.1, .8, .1),
   r_s = seq(-0.01767, 0.01623, 0.002),
-  error = 0.1,
+  error = 0.5,
   p = 0.2,
   k = 10000,
   years = 100,
@@ -218,7 +220,7 @@ colnames(results_hcr) <- col_names
 
 #Write as CSV:
 library(here)
- write.csv(results_hcr, file=file.path(here(),"/Results/discussion_runs/lowerror/run5/lowerr_20_run5.csv"),
+ write.csv(results_hcr, file=file.path(here(),"/Results/discussion_runs/higherror/run5/higherr_0_run5.csv"),
            row.names = FALSE)
 
 ```

@@ -217,3 +217,12 @@ combo4 <- baseline %>%
   mutate(prop_bad = (closed)/(good + closed))
 ```
 
+```{r}
+chase_check <- baseline %>% 
+  group_by(error, hcr, assess) %>% 
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(prop_bad = (closed + over)/(good + closed + over))
+```
+

@@ -146,17 +146,7 @@ graph_df <- rbind(over, closed)
 err_all[is.na(err_all)] <- "misc" #Change any status = NA to misc for now
 
 prop_all <- err_all %>% 
-  group_by(error, status) %>% 
-  count(status) %>% 
-  rename("count" = n) %>% 
-  spread(key = "status", value = "count") %>% 
-  mutate(simulations = sum(closed + good + misc + over)) %>% 
-  mutate(prop_over = over / simulations) %>% 
-  mutate(prop_closed = closed / simulations) %>% 
-  mutate(prop_bad = (closed + over) / simulations)
-
-prop_filtered <- err_all %>% 
-  filter(assess == 5 | assess == 10) %>% 
+  filter(assess != 0) %>% 
   group_by(error, status) %>% 
   count(status) %>% 
   rename("count" = n) %>% 
@@ -167,8 +157,8 @@ prop_filtered <- err_all %>%
   mutate(prop_bad = (closed + over) / simulations)
 
 #Combine for stacked graph:
-over_c <- data.frame(error = prop_filtered$error, type = rep("over",3), prop = prop_filtered$prop_over, productivity = rep("constant", 3))
-closed_c <- data.frame(error = prop_filtered$error, type = rep("closed",3), prop = prop_filtered$prop_closed, productivity = rep("constant", 3))
+over_c <- data.frame(error = prop_all$error, type = rep("over",3), prop = prop_all$prop_over, productivity = rep("constant", 3))
+closed_c <- data.frame(error = prop_all$error, type = rep("closed",3), prop = prop_all$prop_closed, productivity = rep("constant", 3))
 graph_c <- rbind(over_c, closed_c)
 
 ```
@@ -255,7 +245,7 @@ prop_combo <- err %>%
   mutate(prop_bad = (closed + over) / simulations) 
 
 #Stacked graphing df:
-graph_c2 <- data.frame(error = prop_c_both$error, prop = prop_c_both$prop_bad, productivity = rep("constant", 3))
+graph_c2 <- data.frame(error = prop_all$error, prop = prop_all$prop_bad, productivity = rep("constant", 3))
 graph_u2 <- data.frame(error = prop_filtered$error, prop = prop_combo$prop_bad, productivity = rep("updating", 3))
 graph_both2 <- rbind(graph_c2, graph_u2)
 ```

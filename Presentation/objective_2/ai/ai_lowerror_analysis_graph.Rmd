@@ -20,6 +20,8 @@ rep_10 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep
 rep_15 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror.csv"))
 rep_20 <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20rep_lowerror.csv"))
 
+all_reps <- read_csv(file=file.path(here(), "/Presentation/discussion/alldata_combined.csv"))
+
 ```
 
 ##Constant Fmsy:  
@@ -94,6 +96,34 @@ over <- data.frame(assess_int = ai_lowerror$assess_int, type = rep("over",6), pr
 closed <- data.frame(assess_int = ai_lowerror$assess_int, type = rep("closed",6), prop = ai_lowerror$prop_closed)
 graph_df <- rbind(over, closed)
 
+
+
+##Wrangling with the large combined data set:
+ai_intervals <- c(20,15,10,5,1) #new intervals without 0rep
+ai_intervals_f <- factor(ai_intervals, levels = ai_intervals)
+
+ai <- all_reps %>% 
+  # filter(error == 0.1) %>% 
+  filter(assess != 0)
+
+ai[is.na(ai)] <- "misc" #turn status NA into misc
+
+ai_props <- ai %>% 
+  mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
+  group_by(assess_int) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(prop_over = over / simulations) %>% 
+  mutate(prop_closed = closed / simulations) %>% 
+  mutate(prop_bad = (closed + over)/ simulations)
+
+#Stacked bar graph:
+over2 <- data.frame(assess_int = ai_props$assess_int, type = rep("over",5), prop = ai_props$prop_over)
+closed2 <- data.frame(assess_int = ai_props$assess_int, type = rep("closed",5), prop = ai_props$prop_closed)
+graph_df2 <- rbind(over2, closed2)
+
 ```
 
 Want to show all the runs together and then also break out only the starting biomass of 1500:  
@@ -127,8 +157,29 @@ ai_graph_stack <- ggplot(graph_df, aes(x= assess_int, y = prop)) +
         plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
     legend.box.background = element_blank())
 ai_graph_stack
-ggsave(ai_graph_stack, filename = "assessment1.png",  bg = "transparent")
+#ggsave(ai_graph_stack, filename = "assessment1.png",  bg = "transparent")
+
+
+
 ```
+
+FINAL - stacked column graph for all biomasses:
+```{r}
+##Stacked column graph - all biomasses:
+ai_stack <- ggplot(graph_df2, aes(x= assess_int, y = prop)) +
+  geom_col(aes(fill = type), alpha = .7)+
+  theme_light()+
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
+    legend.box.background = element_blank())
+ai_stack
+#ggsave(ai_stack, filename = "assessment_constant_2.3.20.png",  bg = "transparent")
+```
+
 
 
 ##Updating Fmsy:  
@@ -187,7 +238,7 @@ rep20_1u <- rep_20u %>%
 
 
 #Define the interval factors:
-intervals <- c("Never",20,15,10,5,1) 
+intervals <- c(20,15,10,5,1) 
 intervals_f <- factor(intervals, levels = intervals)
 
 #Combine for starting biomass 1500:
@@ -203,13 +254,19 @@ ai_lowerror_u <- rbind(rep0_1u, rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) 
 
 
 #Combine for all:
-ai_lowerror_all_u <- rbind(rep0_1u, rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>%
-  mutate(assess_int = factor(int, levels = intervals)) %>%
+ai_lowerror_all_u <- rbind(rep0_1u, rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u) %>% 
+filter(int != "Never")
+
+ai_lowerror_all_u[is.na(ai_lowerror_all_u)] <- "misc"
+
+ai_u <- ai_lowerror_all_u %>% 
+  mutate(assess_int = factor(int, levels = intervals)) %>% 
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(prop_bad = (closed + over)/ (closed + over + good))
+  mutate(simulations = sum(closed + over + good +misc)) %>% 
+  mutate(prop_bad = (closed + over)/ simulations)
 
 
 
@@ -219,9 +276,9 @@ Create the graph dataframe:
 ```{r wrangle-graph-data, include=FALSE}
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_lowerror$assess_int, productivity = rep("constant", 6), prop_bad = ai_lowerror_all$prop_bad)
-graph_u <- data.frame(assessment_interval = ai_lowerror_u$assess_int, productivity = rep("updating", 6),
-                      prop_bad = ai_lowerror_all_u$prop_bad)
+graph_c <- data.frame(assessment_interval = ai_props$assess_int, productivity = rep("constant", 5), prop_bad = ai_props$prop_bad)
+graph_u <- data.frame(assessment_interval = ai_u$assess_int, productivity = rep("updating", 5),
+                      prop_bad = ai_u$prop_bad)
 graph_both_all <- rbind(graph_c, graph_u)
 
 
@@ -248,11 +305,19 @@ ai_1500_both <- ggplot(graph_both1500, aes(x = assessment_interval, y = prop_bad
     legend.box.background = element_blank()) 
 
 ai_1500_both
-ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
+#ggsave(ai_1500_both, filename = "assessment2.png",  bg = "transparent")
 
 ai_all_both <- ggplot(graph_both_all, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
-  geom_col(position = "dodge")
+  geom_col(position = "dodge", alpha = 0.7) + 
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Productivity", labels = c("Constant", "Updating"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) 
 
 ai_all_both
+#ggsave(ai_all_both, filename = "ai_both_2.3.20.png",  bg = "transparent")
 ```
 

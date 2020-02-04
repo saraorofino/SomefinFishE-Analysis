@@ -103,8 +103,12 @@ ai_intervals <- c(20,15,10,5,1) #new intervals without 0rep
 ai_intervals_f <- factor(ai_intervals, levels = ai_intervals)
 
 ai <- all_reps %>% 
-  # filter(error == 0.1) %>% 
-  filter(assess != 0)
+  filter(error == 0.1 | error == 0.3) %>% 
+  filter(assess != 0) %>% 
+  filter(hcr <= .9) %>% 
+  filter(r_s <= 0) %>% 
+  filter(b_0 == 1500) %>% 
+  filter(r_s >= -0.00767)
 
 ai[is.na(ai)] <- "misc" #turn status NA into misc
 
@@ -114,7 +118,7 @@ ai_props <- ai %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_over = over / simulations) %>% 
   mutate(prop_closed = closed / simulations) %>% 
   mutate(prop_bad = (closed + over)/ simulations)
@@ -177,7 +181,7 @@ ai_stack <- ggplot(graph_df2, aes(x= assess_int, y = prop)) +
         plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
     legend.box.background = element_blank())
 ai_stack
-#ggsave(ai_stack, filename = "assessment_constant_2.3.20.png",  bg = "transparent")
+ggsave(ai_stack, filename = "assessment_constant_2.3.20.png",  bg = "transparent")
 ```
 
 
@@ -309,7 +313,7 @@ ai_1500_both
 
 ai_all_both <- ggplot(graph_both_all, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
   geom_col(position = "dodge", alpha = 0.7) + 
-  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Productivity", labels = c("Constant", "Updating"))+
+  scale_fill_manual(values = c("#079EDF", "#BC6435"), name = "Productivity", labels = c("Constant", "Updating"))+
   theme_light()+
   coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
   labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
@@ -318,6 +322,15 @@ ai_all_both <- ggplot(graph_both_all, aes(x = assessment_interval, y = prop_bad,
     legend.box.background = element_blank()) 
 
 ai_all_both
-#ggsave(ai_all_both, filename = "ai_both_2.3.20.png",  bg = "transparent")
+ggsave(ai_all_both, filename = "ai_both_2.3.20.png",  bg = "transparent")
 ```
+
+#graph for appendix slide, filtered 
+
+```{r}
+
+
+```
+
+
 

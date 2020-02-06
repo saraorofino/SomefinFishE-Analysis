@@ -243,3 +243,42 @@ hcr_stacked_c
 
 ```
 
+Severe climate graph:  
+```{r}
+#Severe climate graph for appendix:
+alldata <- read_csv(file = file.path(here(), "/Presentation/discussion/alldata_combined.csv"))
+
+prop_sev <- alldata %>%
+  filter(r_s < -0.00767) %>% 
+  group_by(hcr, status) %>% 
+  count(status) %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over)) %>% 
+  mutate(prop_over = over / simulations) %>% 
+  mutate(prop_closed = closed / simulations) %>% 
+  mutate(prop_bad = (closed + over) / simulations)
+
+#Create the df for stacked graph:
+over_sev <- data.frame(hcr = prop_sev$hcr, type = rep("over", 10), prop = prop_sev$prop_over)
+closed_sev <- data.frame(hcr = prop_sev$hcr, type = rep("closed", 10), prop = prop_sev$prop_closed)
+stacked_sev <- rbind(over_sev, closed_sev)
+
+#Graph:
+hcr_stacked_sev <- ggplot(stacked_sev, aes(x = hcr, y = prop)) +
+  geom_col(aes(fill = type), alpha = .7)+
+  theme_light()+
+  scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
+  coord_cartesian( ylim=c(0,.90), expand = FALSE ) +
+  labs(title = "Harvest Control Rules", x = "Reduction Amount", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
+    legend.box.background = element_blank())
+
+
+hcr_stacked_sev
+ggsave(hcr_stacked_c, filename = "hcr_stack_2.3.20.png",  bg = "transparent")
+```
+

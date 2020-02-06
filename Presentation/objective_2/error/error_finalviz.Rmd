@@ -219,7 +219,6 @@ Severe climate graph:
 
 prop_sev <- err_all %>% 
   filter(r_s < -0.00767) %>% 
-  filter(assess != 0) %>% 
   group_by(error, status) %>% 
   count(status) %>% 
   rename("count" = n) %>% 
@@ -249,7 +248,7 @@ prop_graph_sev <- ggplot(graph_sev, aes(x= fct_rev(error), y=prop)) +
     legend.box.background = element_blank()) 
 
 prop_graph_sev
-#ggsave(prop_graph_sev, filename = "error_severe.png",  bg = "transparent")
+ggsave(prop_graph_sev, filename = "error_severe.png",  bg = "transparent")
 ```
 
 

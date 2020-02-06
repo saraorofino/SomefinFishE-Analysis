@@ -167,8 +167,8 @@ prop_filtered <- err_all %>%
   mutate(prop_bad = (closed + over) / simulations)
 
 #Combine for stacked graph:
-over_c <- data.frame(error = prop_filtered$error, type = rep("over",3), prop = prop_filtered$prop_over, productivity = rep("constant", 3))
-closed_c <- data.frame(error = prop_filtered$error, type = rep("closed",3), prop = prop_filtered$prop_closed, productivity = rep("constant", 3))
+over_c <- data.frame(error = prop_all$error, type = rep("over",3), prop = prop_all$prop_over, productivity = rep("constant", 3))
+closed_c <- data.frame(error = prop_all$error, type = rep("closed",3), prop = prop_all$prop_closed, productivity = rep("constant", 3))
 graph_c <- rbind(over_c, closed_c)
 
 ```
@@ -211,6 +211,48 @@ prop_graph
 #ggsave(prop_graph, filename = "error_2.3.20.png",  bg = "transparent")
 
 ```
+
+
+Severe climate graph:
+```{r}
+####Appendix graph of error with just severe climate change:
+
+prop_sev <- err_all %>% 
+  filter(r_s < -0.00767) %>% 
+  filter(assess != 0) %>% 
+  group_by(error, status) %>% 
+  count(status) %>% 
+  rename("count" = n) %>% 
+  spread(key = "status", value = "count") %>% 
+  mutate(simulations = sum(closed + good + over)) %>% 
+  mutate(prop_over = over / simulations) %>% 
+  mutate(prop_closed = closed / simulations) %>% 
+  mutate(prop_bad = (closed + over) / simulations)
+
+#Combine for stacked graph:
+over_sev <- data.frame(error = prop_sev$error, type = rep("over",3), prop = prop_sev$prop_over, productivity = rep("constant", 3))
+closed_sev <- data.frame(error = prop_sev$error, type = rep("closed",3), prop = prop_sev$prop_closed, productivity = rep("constant", 3))
+graph_sev <- rbind(over_sev, closed_sev)
+graph_sev$error <- as.factor(graph_sev$error)
+
+#Create the graph:
+prop_graph_sev <- ggplot(graph_sev, aes(x= fct_rev(error), y=prop)) + 
+  geom_col(aes(fill = type), alpha = 0.7)+
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.80), expand = FALSE ) +
+  labs(title = "Error Assessments", x = "Error Amount", y = "Proportion Closed/Overfished")+
+  scale_x_discrete(labels=c("0.5" = "50%", "0.3" = "30%",
+                              "0.1" = "10%")) +
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) 
+
+prop_graph_sev
+#ggsave(prop_graph_sev, filename = "error_severe.png",  bg = "transparent")
+```
+
+
 
 ##Constant vs. Updating Fmsy
 

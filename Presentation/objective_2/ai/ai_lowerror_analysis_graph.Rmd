@@ -184,6 +184,47 @@ ai_stack
 ggsave(ai_stack, filename = "assessment_constant_2.3.20.png",  bg = "transparent")
 ```
 
+Severe climate graph:  
+```{r}
+#Severe  climate appendix graph:
+
+ai_intervals <- c(20,15,10,5,1) #new intervals without 0rep
+ai_intervals_f <- factor(ai_intervals, levels = ai_intervals)
+
+ai <- all_reps %>% 
+  filter(r_s < -0.00767) %>% 
+  filter(assess != 0)
+
+ai_props_sev <- ai %>% 
+  mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
+  group_by(assess_int) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
+  mutate(prop_over = over / simulations) %>% 
+  mutate(prop_closed = closed / simulations) %>% 
+  mutate(prop_bad = (closed + over)/ simulations)
+
+#Stacked bar graph df:
+over_sev <- data.frame(assess_int = ai_props_sev$assess_int, type = rep("over",5), prop = ai_props_sev$prop_over)
+closed_sev <- data.frame(assess_int = ai_props_sev$assess_int, type = rep("closed",5), prop = ai_props_sev$prop_closed)
+graph_sev <- rbind(over_sev, closed_sev)
+
+#Graph:
+ai_stack_sev <- ggplot(graph_sev, aes(x= assess_int, y = prop)) +
+  geom_col(aes(fill = type), alpha = .7)+
+  theme_light()+
+  scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
+  coord_cartesian( ylim=c(0,.80), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA),legend.background = element_blank(),
+    legend.box.background = element_blank())
+ai_stack_sev
+ggsave(ai_stack_sev, filename = "assessment_constant_2.3.20.png",  bg = "transparent")
+```
 
 
 ##Updating Fmsy:  

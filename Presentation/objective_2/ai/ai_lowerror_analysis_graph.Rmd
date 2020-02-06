@@ -216,7 +216,7 @@ ai_stack_sev <- ggplot(graph_sev, aes(x= assess_int, y = prop)) +
   geom_col(aes(fill = type), alpha = .7)+
   theme_light()+
   scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
-  coord_cartesian( ylim=c(0,.80), expand = FALSE ) +
+  coord_cartesian( ylim=c(0,.90), expand = FALSE ) +
   labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
   theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
         panel.background = element_rect(fill = "transparent",colour = NA),

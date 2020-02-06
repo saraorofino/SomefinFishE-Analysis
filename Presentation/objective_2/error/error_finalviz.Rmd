@@ -239,7 +239,7 @@ prop_graph_sev <- ggplot(graph_sev, aes(x= fct_rev(error), y=prop)) +
   geom_col(aes(fill = type), alpha = 0.7)+
   scale_fill_manual(values = c("#079EDF", "#B8CE55"), name = "Failure Type", labels = c("Overfished", "Closed"))+
   theme_light()+
-  coord_cartesian( ylim=c(0,.80), expand = FALSE ) +
+  coord_cartesian( ylim=c(0,.90), expand = FALSE ) +
   labs(title = "Error Assessments", x = "Error Amount", y = "Proportion Closed/Overfished")+
   scale_x_discrete(labels=c("0.5" = "50%", "0.3" = "30%",
                               "0.1" = "10%")) +

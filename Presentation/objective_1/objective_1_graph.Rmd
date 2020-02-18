@@ -83,3 +83,38 @@ obj_1_graph
 ggsave(obj_1_graph, filename = "obj_1.png",  bg = "transparent")
 ```
 
+A second graph for the report that compares the yearly implementation of FISHE with and without climate:
+```{r}
+#Copy the noclim perfect and perfect with clim from above:
+noclim_perf_1 <- noclim_perf %>%
+  filter(r == 0.4) %>% 
+  filter(hcr == 0.7) %>% 
+  mutate(run = "noclim_perf") %>% 
+  mutate(ID = id + 10)
+
+perfect_1 <- perfect %>% 
+  filter(r_0 == 0.4) %>% 
+  filter(hcr == 0.7) %>% 
+  filter(r_s == -0.00767) %>% 
+  mutate(run = "perfect") %>% 
+  mutate(ID = id + 100)
+
+graph_df <- rbind(noclim_perf_1, perfect_1) %>% 
+  group_by(ID) %>% 
+  filter(b_0 == 1500)
+
+##Graph it:
+obj_1_graph2 <- ggplot(graph_df, aes(x = year, y = b, group = ID)) +
+  geom_line(aes(color = run), size = 1.25) +
+  scale_color_manual(values = c("#079EDF", "#B8CE55"), name = "Scenario", labels = c("No Climate Change", "Climate Change"))+
+  theme_light() +
+  coord_cartesian( ylim=c(0,6000), expand = FALSE ) +
+  labs(title = "FISHE Mangement", x = "Year", y = "Biomass")+
+  theme(legend.key = element_rect(fill = "transparent", colour = "transparent"), axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 15), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12), legend.background = element_blank(),
+    legend.box.background = element_blank())
+
+obj_1_graph2
+ggsave(obj_1_graph2, filename = "obj_1_ideal.png",  bg = "transparent")
+```
+

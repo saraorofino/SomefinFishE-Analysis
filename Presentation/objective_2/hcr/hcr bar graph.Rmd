@@ -120,7 +120,7 @@ stacked <- rbind(over_c, closed_c)
 #Combine constant and updating:
 prop_c <- data.frame(hcr = prop_all$hcr, productivity = rep("constant", 10), prop_bad = prop_all$prop_bad)
 prop_u <- data.frame(hcr = rep_u$hcr, productivity = rep("updating", 10), prop_bad = rep_u$prop_bad)
-stacked <- rbind(prop_c, prop_u)
+stacked_both <- rbind(prop_c, prop_u)
 ```
 
 
@@ -187,7 +187,7 @@ rep_c_1 <- rep_c %>%
 
 rep_both <- rbind(rep_u_1, rep_c_1)
 
-hcr_bar_both <- ggplot(stacked, aes(x = hcr, y = prop_bad)) +
+hcr_bar_both <- ggplot(stacked_both, aes(x = hcr, y = prop_bad)) +
   geom_col(aes(fill = productivity), position = "dodge", alpha = .7) +
   scale_fill_manual(
   values = c("#079EDF", "#B8CE55"),

@@ -279,6 +279,6 @@ hcr_stacked_sev <- ggplot(stacked_sev, aes(x = hcr, y = prop)) +
 
 
 hcr_stacked_sev
-ggsave(hcr_stacked_c, filename = "hcr_stack_2.3.20.png",  bg = "transparent")
+ggsave(hcr_stacked_sev, filename = "hcr_stack_2.3.20.png",  bg = "transparent")
 ```
 

@@ -213,7 +213,7 @@ colnames(results_noclose) <- col_names
 
 #Write as CSV:
 library(here)
-write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/lowerror/lowerr_20_run1.csv"),
+write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/miderror/miderr_20_run1.csv"),
            row.names = FALSE)
 
 ```

@@ -221,6 +221,7 @@ Graph for 80% cutback:
 ```{r graph}
 #Make sure the assessment intervals is a factor for graphing:
 prop_80$assess <- as.factor(prop_80$assess)
+prop_80$assess <- factor(prop_80$assess , levels = c(1,5,10,15,20))
 
 graph_80 <- ggplot(prop_80, aes(x=assess, y=prop_over)) + 
   geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +
@@ -237,6 +238,7 @@ Graph for 95% cutback:
 ```{r graph}
 #Make sure the assessment intervals is a factor for graphing:
 prop_95$assess <- as.factor(prop_95$assess)
+prop_95$assess <- factor(prop_95$assess , levels = c(1,5,10,15,20))
 
 graph_95 <- ggplot(prop_95, aes(x=assess, y=prop_over)) + 
   geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +

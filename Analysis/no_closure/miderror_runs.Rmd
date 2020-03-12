@@ -4,6 +4,10 @@ author: "Sara Orofino"
 date: "3/11/2020"
 output: html_document
 ---
+```{r}
+library(tidyverse)
+library(here)
+```
 
 Check the mid error runs to see if the assessment interval trend reverses when not closing the fishery for being over the limit  
 

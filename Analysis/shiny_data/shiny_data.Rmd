@@ -34,61 +34,71 @@ low1 <- low_err_1 %>%
   mutate(assess = "1") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6 & r_0 != 0.8)
 
 mid1 <- mid_err_1 %>% 
   mutate(assess = "1") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 low5 <- low_err_5 %>% 
   mutate(assess = "5") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 mid5 <- mid_err_5 %>% 
   mutate(assess = "5") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 low10 <- low_err_10 %>% 
   mutate(assess = "10") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 mid10 <- mid_err_10 %>% 
   mutate(assess = "10") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 low15 <- low_err_15 %>% 
   mutate(assess = "15") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 mid15 <- mid_err_15 %>% 
   mutate(assess = "15") %>% 
   filter(r_s < 0) %>% 
-  filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  filter(r_s >= -0.00767) %>%
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 low20 <- low_err_20 %>% 
   mutate(assess = "20") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 
 mid20 <- mid_err_20 %>% 
   mutate(assess = "20") %>% 
   filter(r_s < 0) %>% 
   filter(r_s >= -0.00767) %>% 
-  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+  dplyr::select(b, c, year, r, id, r_0, error, r_s, hcr, b_0, assess)
+  #filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
 ```
 
 Combine and save file:  

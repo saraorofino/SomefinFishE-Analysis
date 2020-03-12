@@ -1,0 +1,103 @@
+---
+title: "shiny"
+author: "Sara Orofino"
+date: "3/12/2020"
+output: html_document
+---
+
+##Create data for shiny app
+
+Read in data files from one of the discussion runs at low error and moderate error for all the assessment intervals (1,5,20,15,20)  
+
+```{r read-in}
+library(here)
+
+low_err_1 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run2/lowerr_1_run2.csv"))
+mid_err_1 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run2/miderr_1_run2.csv"))
+
+low_err_5 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run2/lowerr_5_run2.csv"))
+mid_err_5 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run2/miderr_5_run2.csv"))
+
+low_err_10 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run2/lowerr_10_run2.csv"))
+mid_err_10 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run2/miderr_10_run2.csv"))
+
+low_err_15 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run2/lowerr_15_run2.csv"))
+mid_err_15 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run2/miderr_15_run2.csv"))
+
+low_err_20 <- read_csv(file=file.path(here(),"/Results/discussion_runs/lowerror/run2/lowerr_20_run2.csv"))
+mid_err_20 <- read_csv(file=file.path(here(),"/Results/discussion_runs/miderror/run2/miderr_20_run2.csv"))
+```
+
+Add assessment indicator, filter for moderate negative climate change, and filter growth rates every other one  
+```{r wrangle}
+low1 <- low_err_1 %>% 
+  mutate(assess = "1") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+mid1 <- mid_err_1 %>% 
+  mutate(assess = "1") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+low5 <- low_err_5 %>% 
+  mutate(assess = "5") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+mid5 <- mid_err_5 %>% 
+  mutate(assess = "5") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+low10 <- low_err_10 %>% 
+  mutate(assess = "10") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+mid10 <- mid_err_10 %>% 
+  mutate(assess = "10") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+low15 <- low_err_15 %>% 
+  mutate(assess = "15") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+mid15 <- mid_err_15 %>% 
+  mutate(assess = "15") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+low20 <- low_err_20 %>% 
+  mutate(assess = "20") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+
+mid20 <- mid_err_20 %>% 
+  mutate(assess = "20") %>% 
+  filter(r_s < 0) %>% 
+  filter(r_s >= -0.00767) %>% 
+  filter(r_0 != 0.2 & r_0 != 0.4 & r_0 != 0.6)
+```
+
+Combine and save file:  
+```{r combine}
+#combine:
+shiny_data <- rbind(low1,mid1,low5,mid5,low10,mid10,low15,mid15,low20,mid20)
+
+#save file:
+write.csv(shiny_data, file=file.path(here(),"/Analysis/shiny_data/shiny_biomass.csv"),
+          row.names = FALSE)
+```
+

@@ -12,7 +12,7 @@ library(here)
 Check the mid error runs to see if the assessment interval trend reverses when not closing the fishery for being over the limit  
 
 Read in the mid error datasets:  
-```{r}
+```{r read-in, warning=FALSE, message=FALSE}
 #Assessment interval 1 year:
 mid_1_80 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_1_80.csv"))
 mid_1_85 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_1_85.csv"))
@@ -47,7 +47,7 @@ mid_20_95 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr
 
 For each data set add the status, growth, and assessment interval, filter for year 100  
 Combine the different assessment levels for each of the four over_hcrs   
-```{r}
+```{r wrangle-combine}
 #80% cutback runs:
 mid1_80 <- mid_1_80 %>%   
   mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
@@ -261,7 +261,7 @@ Still confused why 1 year isn't better than 20 years. Doing some exploring:
 ```{r explore}
 
 #Line plot of biomass over time for the every year assessment at 80% cutback:
-plot1_80 <- mid_1_80 %>% 
+plot1_95 <- mid_1_95 %>% 
   filter(b_0 == 1500) %>% 
   filter(r_s < 0) %>%
   filter(r_s > -0.00767) %>% 
@@ -270,12 +270,12 @@ plot1_80 <- mid_1_80 %>%
   facet_wrap(~hcr) +
   theme_bw() +
   scale_color_continuous(low = "#079EDF", high = "#B8CE55", name = "Growth Rate") +
-  labs(title = "Every year with 80% HCR if over limit", y = "Biomass", x = "Year") +
+  labs(title = "Every year with 95% HCR if over limit", y = "Biomass", x = "Year") +
   theme(axis.text.x=element_text(size=10), plot.title = element_text(hjust = 0.5, face = "bold", size = 15), axis.title.x = element_text(face = "bold"), axis.title.y = element_text(face = "bold"))
-plot1_80
+plot1_95
 
 #Compare to every 20 years at 80% cutback:
-plot20_80 <- mid_20_80 %>% 
+plot20_95 <- mid_20_95 %>% 
   filter(b_0 == 1500) %>% 
   filter(r_s < 0) %>%
   filter(r_s > -0.00767) %>% 
@@ -284,9 +284,9 @@ plot20_80 <- mid_20_80 %>%
   facet_wrap(~hcr) +
   theme_bw() +
   scale_color_continuous(low = "#079EDF", high = "#B8CE55", name = "Growth Rate") +
-  labs(title = "Every 20 years with 80% HCR if over limit", y = "Biomass", x = "Year") +
+  labs(title = "Every 20 years with 95% HCR if over limit", y = "Biomass", x = "Year") +
   theme(axis.text.x=element_text(size=10), plot.title = element_text(hjust = 0.5, face = "bold", size = 15), axis.title.x = element_text(face = "bold"), axis.title.y = element_text(face = "bold"))
-plot20_80
+plot20_95
 ```
 
  

@@ -25,9 +25,7 @@ assess_int <- seq(1,100,1)
 
 ```{r model}
 
-#Baseline model with error around the f_ratio (f/fmsy) and repetition of the assessment process every 5 years for the duration of the simulation:
-
-sim_noclose <- function(b, r, r_s, error, p, k, years, hcr, over_hcr){
+sim_noclose <- function(b, r, r_s, error, p, k, years, hcr){
   
   results <- data.frame(
     b = rep(NA, years), c = rep(NA, years), 
@@ -57,7 +55,7 @@ sim_noclose <- function(b, r, r_s, error, p, k, years, hcr, over_hcr){
   
   #Decide how to change f based on the f ratio estimate with error:
   if(results$f_ratio_err[1] >= 2){
-       results$f[1] = over_hcr*f_int #Reduce by the over_cutback value
+       results$f[1] = f_int #Keep initial f but adjust the catch 
    } 
     if(results$f_ratio_err[1] > 1.1 & results$f_ratio_err[1] < 2){
        results$f[1] = hcr*f_int #Reduce by hcr
@@ -69,8 +67,14 @@ sim_noclose <- function(b, r, r_s, error, p, k, years, hcr, over_hcr){
        results$f[1] = 1.05*f_int #f increases by 5% from last year
    } 
   
-  #Calculate catch in year one based on the new f:
-  results$c[1] = results$f[1] * results$b[1] 
+  #Calculate catch - adjust if f_ratio is over the limit:
+  if(results$f_ratio_err[1] >= 2){
+    results$c[1] = results$f[1] * results$b[1] * 0.10 #only keep 90% of the catch 
+  } 
+  if(results$f_ratio_err[1] < 2){
+    results$c[1] = results$f[1] * results$b[1] 
+  }
+  
   
   ## Loop the model over the specified number of years
   # Repeat on 5 year intervals - make the HCR decision based on the previous years data and apply the f to the current assessment year, this f remains constant until next assessment
@@ -99,7 +103,7 @@ sim_noclose <- function(b, r, r_s, error, p, k, years, hcr, over_hcr){
     
     #Decisions for f this year based on the ratio with error in the previous year 
     if(results$f_ratio_err[t] >= 2){
-       results$f[t] = over_hcr*f_int #Reduce by the over_cutback value (same as keeping over_cutback%) 
+       results$f[t] = results$f[t-1] #f stays the same as last year but catch will change in that year 
    } 
     if(results$f_ratio_err[t] > 1.1 & results$f_ratio_err[t] < 2){
        results$f[t] = hcr*results$f[t-1] #Reduce by hcr - same thing as keeping (hcr%) of previous fishing mortality
@@ -114,7 +118,15 @@ sim_noclose <- function(b, r, r_s, error, p, k, years, hcr, over_hcr){
     
     #Calculate remaining results - pay attention to the order!
     results$b[t] = results$b[t-1] + (results$r[t-1] / p)*results$b[t-1]*(1 - ((results$b[t-1]/k) ^ p))-results$c[t-1]
+    
+  #Calculate catch - adjust if f_ratio is over the limit:
+  if(results$f_ratio_err[t] >= 2){
+    results$c[t] = results$f[t] * results$b[t] * 0.10 #only keep 90% of the catch 
+  } 
+  if(results$f_ratio_err[t] < 2){
     results$c[t] = results$f[t] * results$b[t]
+  }
+
    } 
 
   if(results$year[t] %not_in% assess_int){
@@ -154,8 +166,7 @@ list_noclose <- list(
   p = 0.2,
   k = 10000,
   years = 100,
-  hcr = seq(0.95, 0.50, -0.05), #5% cutback to 50% cutback 
-  over_hcr = 0.05
+  hcr = seq(0.95, 0.50, -0.05) #5% cutback to 50% cutback 
 )
 
 input_noclose <- list_noclose %>%
@@ -178,8 +189,7 @@ for(i in 1:4080){
   results[[i]] <- sim_noclose(b=input_noclose[[i]]$b, r=input_noclose[[i]]$r,
                              r_s=input_noclose[[i]]$r_s, p=input_noclose[[i]]$p,
                              k=input_noclose[[i]]$k,years=input_noclose[[i]]$years, 
-                             error = input_noclose[[i]]$error, hcr = input_noclose[[i]]$hcr,
-                             over_hcr = input_noclose[[i]]$over_hcr)
+                             error = input_noclose[[i]]$error, hcr = input_noclose[[i]]$hcr)
 }
 
 ```
@@ -202,7 +212,7 @@ for(i in 1:4080){
   dat$err <- rep(input_noclose[[i]]$error, 100)
   dat$r_s <- rep(input_noclose[[i]]$r_s, 100)
   dat$hcr <- rep(input_noclose[[i]]$hcr, 100)
-  dat$over_hcr <- rep(input_noclose[[i]]$over_hcr, 100)
+  dat$over_hcr <- rep(0.05, 100)
   dat$b_0 <- rep(input_noclose[[i]]$b, 100)
   results_id[[i]] <- dat
 }
@@ -215,7 +225,7 @@ colnames(results_noclose) <- col_names
 #Write as CSV:
 #Naming convention for files errorlevel_assessmentinterval_overhcr(%)
 library(here)
-write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/miderror/miderr_1_95.csv"),
+write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/miderror/miderr_1_90.csv"),
            row.names = FALSE)
 
 ```

@@ -218,7 +218,7 @@ prop_95 <- miderr_95 %>%
 ```
 
 Graph for 80% cutback:   
-```{r graph}
+```{r graph-80}
 #Make sure the assessment intervals is a factor for graphing:
 prop_80$assess <- as.factor(prop_80$assess)
 prop_80$assess <- factor(prop_80$assess , levels = c(1,5,10,15,20))
@@ -234,8 +234,43 @@ graph_80 <- ggplot(prop_80, aes(x=assess, y=prop_over)) +
 graph_80
 ```
 
+Graph for 85% cutback:   
+```{r graph-85}
+#Make sure the assessment intervals is a factor for graphing:
+prop_85$assess <- as.factor(prop_85$assess)
+prop_85$assess <- factor(prop_85$assess , levels = c(1,5,10,15,20))
+
+graph_85 <- ggplot(prop_85, aes(x=assess, y=prop_over)) + 
+  geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA))
+graph_85
+```
+
+Graph for 90% cutback:   
+```{r graph-90}
+#Make sure the assessment intervals is a factor for graphing:
+prop_90$assess <- as.factor(prop_90$assess)
+prop_90$assess <- factor(prop_90$assess , levels = c(1,5,10,15,20))
+
+graph_90 <- ggplot(prop_90, aes(x=assess, y=prop_over)) + 
+  geom_col(position = "dodge", alpha = .7, fill = "#079EDF", width = 0.5)  +
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessments Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15),
+        panel.background = element_rect(fill = "transparent",colour = NA),
+        plot.background = element_rect(fill = "transparent",colour = NA))
+graph_90
+```
+
+
 Graph for 95% cutback:   
-```{r graph}
+```{r graph-95}
 #Make sure the assessment intervals is a factor for graphing:
 prop_95$assess <- as.factor(prop_95$assess)
 prop_95$assess <- factor(prop_95$assess , levels = c(1,5,10,15,20))

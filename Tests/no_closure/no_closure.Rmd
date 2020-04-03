@@ -69,7 +69,7 @@ sim_noclose <- function(b, r, r_s, error, p, k, years, hcr){
   
   #Calculate catch - adjust if f_ratio is over the limit:
   if(results$f_ratio_err[1] >= 2){
-    results$c[1] = results$f[1] * results$b[1] * 0.20 #only keep 80% of the catch 
+    results$c[1] = results$f[1] * results$b[1] * 0.05 #only keep 95% of the catch 
   } 
   if(results$f_ratio_err[1] < 2){
     results$c[1] = results$f[1] * results$b[1] 
@@ -121,7 +121,7 @@ sim_noclose <- function(b, r, r_s, error, p, k, years, hcr){
     
   #Calculate catch - adjust if f_ratio is over the limit:
   if(results$f_ratio_err[t] >= 2){
-    results$c[t] = results$f[t] * results$b[t] * 0.20 #only keep 80% of the catch 
+    results$c[t] = results$f[t] * results$b[t] * 0.05 #only keep 95% of the catch 
   } 
   if(results$f_ratio_err[t] < 2){
     results$c[t] = results$f[t] * results$b[t]
@@ -162,7 +162,7 @@ list_noclose <- list(
   b = c(1500, 4000, 6000),
   r = seq(0.1, .8, .1),
   r_s = seq(-0.01767, 0.01623, 0.002),
-  error = 0.3,
+  error = 0.1,
   p = 0.2,
   k = 10000,
   years = 100,
@@ -225,7 +225,7 @@ colnames(results_noclose) <- col_names
 #Write as CSV:
 #Naming convention for files errorlevel_assessmentinterval_overhcr(%)
 library(here)
-write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/miderror/miderr_1_80.csv"),
+write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/lowerror/lowerr_1_95.csv"),
            row.names = FALSE)
 
 ```

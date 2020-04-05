@@ -1,0 +1,160 @@
+---
+title: "combine_runs_updating"
+author: "Sara Orofino"
+date: "4/5/2020"
+output: html_document
+---
+
+## Updating Fmsy:  
+
+Combine the year 100 biomasses from the low, mid, and high error runs at the different assessment levels for analysis.  
+
+## Packages
+```{r packages}
+library(tidyverse)
+library(here)
+```
+
+## Read Data
+
+Read in the datasets:  
+```{r read-in, warning=FALSE, message=FALSE}
+#Assessment interval 1 year:
+low_1 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/lowerror/lowerr_1_95.csv"))
+mid_1<- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/miderror/miderr_1_95.csv"))
+high_1 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_1_95.csv"))
+
+#Assessment interval 5 year:
+low_5 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/lowerror/lowerr_5_95.csv"))
+mid_5 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/miderror/miderr_5_95.csv"))
+high_5 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_5_95.csv"))
+
+#Assessment interval 10 years:
+low_10 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/lowerror/lowerr_10_95.csv"))
+mid_10 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/miderror/miderr_10_95.csv"))
+high_10 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_10_95.csv"))
+
+#Assessment interval 15 years:
+low_15 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/lowerror/lowerr_15_95.csv"))
+mid_15 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/miderror/miderr_15_95.csv"))
+high_15 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_15_95.csv"))
+
+#Assessment interval 20 years:
+low_20 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/lowerror/lowerr_20_95.csv"))
+mid_20 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/miderror/miderr_20_95.csv"))
+high_20 <- read_csv(file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_20_95.csv"))
+
+```
+
+
+## Wrangle
+Filter for year 100, add ifelse for status and growth rate, add assessment year    
+```{r wrangle}
+low_1_100 <- low_1 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "1")
+
+mid_1_100 <- mid_1 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "1")
+
+high_1_100 <- high_1 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "1")
+
+low_5_100 <- low_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "5")
+
+mid_5_100 <- mid_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "5")
+
+high_5_100 <- high_5 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "5")
+
+low_10_100 <- low_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+mid_10_100 <- mid_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+high_10_100 <- high_10 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "10")
+
+low_15_100 <- low_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "15")
+
+mid_15_100 <- mid_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "15")
+
+high_15_100 <- high_15 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "15")
+
+low_20_100 <- low_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "20")
+
+mid_20_100 <- mid_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "20")
+
+high_20_100 <- high_20 %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(assess = "20")
+```
+
+
+## Combine
+Combine all the runs  
+
+```{r combine}
+noclose_all <- rbind(low_1_100, mid_1_100, high_1_100, low_5_100, mid_5_100, high_5_100,
+                     low_10_100, mid_10_100, high_10_100, low_15_100, mid_15_100, high_15_100,
+                     low_20_100, mid_20_100, high_20_100)
+```
+
+## Save CSV
+```{r save}
+library(here)
+write.csv(noclose_all, file=file.path(here(),"/Analysis/no_closure/all_data/noclose_all_u.csv"),
+          row.names = FALSE)
+```
+

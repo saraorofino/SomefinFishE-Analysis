@@ -1,0 +1,146 @@
+---
+title: "ai_with_noclosure"
+author: "Sara Orofino"
+date: "4/3/2020"
+output: html_document
+---
+
+
+I want to replicate the graphs used in faculty reviews for assessment intervals but instead use the new combined data where instead of closing the fishery if it is over the limit, catch is reduced by 95%.  
+
+## Packages/Data 
+
+```{r packages-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(here)
+
+ai <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all.csv"))
+```
+
+
+## Wrangle
+```{r wrangle}
+##Wrangling with the combined data set:
+ai_intervals <- c(20,15,10,5,1) #new intervals in correct order
+
+ai[is.na(ai)] <- "misc" #turn status NA into misc
+
+# Calculate proportions for graphing:
+ai_props <- ai %>% 
+  mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
+  group_by(assess_int) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(simulations = sum(over + good + misc)) %>% 
+  mutate(prop_over = over / simulations)
+```
+
+## Graph Constant FMSY:
+```{r graph-constant}
+ai_c <- ggplot(ai_props, aes(x = assess_int, y = prop_over)) +
+  geom_col(alpha = 0.7, fill = "#079EDF") + 
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Closed/Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) 
+
+ai_c
+```
+## Wrangle Updating
+
+```{r setup-updating, include=FALSE, message=FALSE, warning=FALSE}
+
+rep_1u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_rep1_updating.csv"))
+rep_5u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror_updatingfmsy.csv"))
+rep_10u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep_lowerror_updatingfmsy.csv"))
+rep_15u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror_updatingfmsy.csv"))
+rep_20u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20rep_lowerror_updatingfmsy.csv"))
+
+```
+
+Wrangle updating data:  
+Filter for year 100, ifelse for status and growth rate, add assessment interval indicator  
+```{r updating-ai-wrangle, include=FALSE}
+
+rep1_1u <- rep_1u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 1)
+
+rep5_1u <- rep_5u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = "5")
+
+rep10_1u <- rep_10u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 10)
+  
+rep15_1u <- rep_15u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 15)
+
+rep20_1u <- rep_20u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
+  mutate(int = 20)
+
+
+#Define the interval factors:
+intervals <- c(20,15,10,5,1) 
+intervals_f <- factor(intervals, levels = intervals)
+
+#Combine for all:
+ai_u <- rbind(rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u)
+
+ai_u[is.na(ai_u)] <- "misc"
+
+ai_u_props <- ai_u %>% 
+  mutate(assess_int = factor(int, levels = intervals)) %>% 
+  group_by(assess_int) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(simulations = sum(closed + over + good +misc)) %>% 
+  mutate(prop_bad = (closed + over)/ simulations)
+
+```
+## Create Graphing Data 
+
+```{r wrangle-graph-data, include=FALSE}
+
+##Create the all graph data frame - start with constant and add updating then merge:
+graph_c <- data.frame(assessment_interval = ai_props$assess_int, productivity = rep("constant", 5),
+                      prop_bad = ai_props$prop_over)
+graph_u <- data.frame(assessment_interval = ai_u_props$assess_int, productivity = rep("updating", 5),
+                      prop_bad = ai_u_props$prop_bad)
+graph_both <- rbind(graph_c, graph_u)
+
+```
+
+
+
+## Graph Constant vs. Updating
+```{r graph-both}
+ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
+  geom_col(position = "dodge", alpha = 0.7) + 
+  scale_fill_manual(values = c("#079EDF", "#BC6435"), name = "Productivity", labels = c("Constant", "Updating"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
+  labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Overfished")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) 
+
+ai_both
+```
+

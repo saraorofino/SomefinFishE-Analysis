@@ -1,5 +1,5 @@
 ---
-title: "combine_runs"
+title: "combine_runs_constant"
 author: "Sara Orofino"
 date: "4/2/2020"
 output: html_document
@@ -18,29 +18,29 @@ library(here)
 Read in the datasets:  
 ```{r read-in, warning=FALSE, message=FALSE}
 #Assessment interval 1 year:
-low_1 <- read_csv(file=file.path(here(),"/Results/no_closure/lowerror/lowerr_1_95.csv"))
-mid_1<- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_1_95.csv"))
-high_1 <- read_csv(file=file.path(here(),"/Results/no_closure/higherror/higherr_1_95.csv"))
+low_1 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/lowerror/lowerr_1_95.csv"))
+mid_1<- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/miderror/miderr_1_95.csv"))
+high_1 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/higherror/higherr_1_95.csv"))
 
 #Assessment interval 5 year:
-low_5 <- read_csv(file=file.path(here(),"/Results/no_closure/lowerror/lowerr_5_95.csv"))
-mid_5 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_5_95.csv"))
-high_5 <- read_csv(file=file.path(here(),"/Results/no_closure/higherror/higherr_5_95.csv"))
+low_5 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/lowerror/lowerr_5_95.csv"))
+mid_5 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/miderror/miderr_5_95.csv"))
+high_5 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/higherror/higherr_5_95.csv"))
 
 #Assessment interval 10 years:
-low_10 <- read_csv(file=file.path(here(),"/Results/no_closure/lowerror/lowerr_10_95.csv"))
-mid_10 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_10_95.csv"))
-high_10 <- read_csv(file=file.path(here(),"/Results/no_closure/higherror/higherr_10_95.csv"))
+low_10 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/lowerror/lowerr_10_95.csv"))
+mid_10 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/miderror/miderr_10_95.csv"))
+high_10 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/higherror/higherr_10_95.csv"))
 
 #Assessment interval 15 years:
-low_15 <- read_csv(file=file.path(here(),"/Results/no_closure/lowerror/lowerr_15_95.csv"))
-mid_15 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_15_95.csv"))
-high_15 <- read_csv(file=file.path(here(),"/Results/no_closure/higherror/higherr_15_95.csv"))
+low_15 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/lowerror/lowerr_15_95.csv"))
+mid_15 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/miderror/miderr_15_95.csv"))
+high_15 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/higherror/higherr_15_95.csv"))
 
 #Assessment interval 20 years:
-low_20 <- read_csv(file=file.path(here(),"/Results/no_closure/lowerror/lowerr_20_95.csv"))
-mid_20 <- read_csv(file=file.path(here(),"/Results/no_closure/miderror/miderr_20_95.csv"))
-high_20 <- read_csv(file=file.path(here(),"/Results/no_closure/higherror/higherr_20_95.csv"))
+low_20 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/lowerror/lowerr_20_95.csv"))
+mid_20 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/miderror/miderr_20_95.csv"))
+high_20 <- read_csv(file=file.path(here(),"/Results/no_closure/constant_fmsy/higherror/higherr_20_95.csv"))
 
 ```
 
@@ -152,7 +152,7 @@ noclose_all <- rbind(low_1_100, mid_1_100, high_1_100, low_5_100, mid_5_100, hig
 ## Save CSV
 ```{r save}
 library(here)
-write.csv(noclose_all, file=file.path(here(),"/Analysis/no_closure/all_data/noclose_all.csv"),
+write.csv(noclose_all, file=file.path(here(),"/Analysis/no_closure/all_data/noclose_all_c.csv"),
           row.names = FALSE)
 ```
 

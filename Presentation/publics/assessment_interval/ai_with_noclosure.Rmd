@@ -14,7 +14,7 @@ I want to replicate the graphs used in faculty reviews for assessment intervals 
 library(tidyverse)
 library(here)
 
-ai <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all.csv"))
+ai_c <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all_c.csv"))
 ```
 
 
@@ -23,10 +23,10 @@ ai <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all
 ##Wrangling with the combined data set:
 ai_intervals <- c(20,15,10,5,1) #new intervals in correct order
 
-ai[is.na(ai)] <- "misc" #turn status NA into misc
+ai_c[is.na(ai_c)] <- "misc" #turn status NA into misc
 
 # Calculate proportions for graphing:
-ai_props <- ai %>% 
+ai_props_c <- ai_c %>% 
   mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
   group_by(assess_int) %>%
   count(status) %>% 
@@ -37,7 +37,7 @@ ai_props <- ai %>%
 
 ## Graph Constant FMSY:
 ```{r graph-constant}
-ai_c <- ggplot(ai_props, aes(x = assess_int, y = prop_over)) +
+ai_c <- ggplot(ai_props_c, aes(x = assess_int, y = prop_over)) +
   geom_col(alpha = 0.7, fill = "#079EDF") + 
   theme_light()+
   coord_cartesian( ylim=c(0,.55), expand = FALSE ) +
@@ -48,90 +48,47 @@ ai_c <- ggplot(ai_props, aes(x = assess_int, y = prop_over)) +
 
 ai_c
 ```
-## Wrangle Updating
 
-```{r setup-updating, include=FALSE, message=FALSE, warning=FALSE}
+## New Updating Data (no closure)  
 
-rep_1u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_rep1_updating.csv"))
-rep_5u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_5rep_lowerror_updatingfmsy.csv"))
-rep_10u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_10rep_lowerror_updatingfmsy.csv"))
-rep_15u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_15rep_lowerror_updatingfmsy.csv"))
-rep_20u <- read_csv(file=file.path(here(), "/Presentation/objective_2/ai/ai_20rep_lowerror_updatingfmsy.csv"))
-
+```{r read-updating, warning=FALSE, message=FALSE}
+ai_u <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all_u.csv"))
 ```
 
-Wrangle updating data:  
-Filter for year 100, ifelse for status and growth rate, add assessment interval indicator  
-```{r updating-ai-wrangle, include=FALSE}
+## Wrangle Updating
+```{r wrangle}
+##Wrangling with the combined data set:
+ai_intervals <- c(20,15,10,5,1) #new intervals in correct order
 
-rep1_1u <- rep_1u %>% 
-  filter(year == 100) %>% 
-  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
-  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = 1)
+ai_u[is.na(ai_u)] <- "misc" #turn status NA into misc
 
-rep5_1u <- rep_5u %>% 
-  filter(year == 100) %>% 
-  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
-  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = "5")
-
-rep10_1u <- rep_10u %>% 
-  filter(year == 100) %>% 
-  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
-  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = 10)
-  
-rep15_1u <- rep_15u %>% 
-  filter(year == 100) %>% 
-  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
-  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = 15)
-
-rep20_1u <- rep_20u %>% 
-  filter(year == 100) %>% 
-  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1500, "over", "good"))) %>% 
-  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast"))) %>% 
-  mutate(int = 20)
-
-
-#Define the interval factors:
-intervals <- c(20,15,10,5,1) 
-intervals_f <- factor(intervals, levels = intervals)
-
-#Combine for all:
-ai_u <- rbind(rep1_1u, rep5_1u, rep10_1u, rep15_1u, rep20_1u)
-
-ai_u[is.na(ai_u)] <- "misc"
-
-ai_u_props <- ai_u %>% 
-  mutate(assess_int = factor(int, levels = intervals)) %>% 
+# Calculate proportions for graphing:
+ai_props_u <- ai_u %>% 
+  mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
-  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(closed + over + good +misc)) %>% 
-  mutate(prop_bad = (closed + over)/ simulations)
-
+  mutate(simulations = sum(over + good + misc)) %>% 
+  mutate(prop_over = over / simulations)
 ```
-## Create Graphing Data 
+
+## Create Graphing Data - both
 
 ```{r wrangle-graph-data, include=FALSE}
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_props$assess_int, productivity = rep("constant", 5),
-                      prop_bad = ai_props$prop_over)
-graph_u <- data.frame(assessment_interval = ai_u_props$assess_int, productivity = rep("updating", 5),
-                      prop_bad = ai_u_props$prop_bad)
+graph_c <- data.frame(assessment_interval = ai_props_c$assess_int, productivity = rep("constant", 5),
+                      prop_over = ai_props_c$prop_over)
+graph_u <- data.frame(assessment_interval = ai_props_u$assess_int, productivity = rep("updating", 5),
+                      prop_over = ai_props_u$prop_over)
 graph_both <- rbind(graph_c, graph_u)
 
 ```
 
 
-
 ## Graph Constant vs. Updating
 ```{r graph-both}
-ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_bad, fill = productivity)) +
+ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_over, fill = productivity)) +
   geom_col(position = "dodge", alpha = 0.7) + 
   scale_fill_manual(values = c("#079EDF", "#BC6435"), name = "Productivity", labels = c("Constant", "Updating"))+
   theme_light()+
@@ -143,4 +100,3 @@ ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_bad, fill = 
 
 ai_both
 ```
-

@@ -18,7 +18,7 @@ The files are too large to run all the error and assessment intervals together, 
 library(tidyverse)
 
 #create an interval vector for times that we do want to do the assessment:
-assess_int <- seq(10,100,10)
+assess_int <- seq(20,100,20)
 
 #Write a "not contained in" function"
 `%not_in%` <- purrr::negate(`%in%`)
@@ -228,7 +228,7 @@ colnames(results_noclose) <- col_names
 #Naming convention for files errorlevel_assessmentinterval_overhcr(%)
 library(here)
 write.csv(results_noclose,
-          file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_10_95.csv"),
+          file=file.path(here(),"/Results/no_closure/updating_fmsy/higherror/higherr_20_95.csv"),
            row.names = FALSE)
 
 ```

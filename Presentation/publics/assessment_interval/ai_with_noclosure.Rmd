@@ -99,4 +99,7 @@ ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_over, fill =
     legend.box.background = element_blank()) 
 
 ai_both
+
+ggsave(ai_both, filename = "ai_both_noclose.png",  bg = "transparent",
+       width = 6, height = 4)
 ```

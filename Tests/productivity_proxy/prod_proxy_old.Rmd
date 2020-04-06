@@ -1,5 +1,5 @@
 ---
-title: "Productivity Proxy"
+title: "Productivity Proxy Old Model"
 author: "Chase Brewster"
 date: "4/2/2020"
 output: html_document
@@ -83,7 +83,7 @@ assess_int <- seq(1, 100, 1)
 
 ##Fmsy is updating with climate change but managers are NOT updating perceived Fmsy 
 
-sim_msy_proxy <- function(b, r, r_s, r_p_s, error, p, k, years, hcr){ 
+sim_proxy_old <- function(b, r, r_s, r_p_s, error, p, k, years, hcr){ 
   
   results <- data.frame(
     b = rep(NA, years), c = rep(NA, years), 
@@ -204,7 +204,7 @@ sim_msy_proxy <- function(b, r, r_s, r_p_s, error, p, k, years, hcr){
 Simple results check:
 ```{r simple-check}
 
-check_result_proxy <- sim_msy_proxy(b=6000, r=0.2, r_s=-0.00967, r_p_s = -0.00367, error=0.3, p=0.2, k=10000, years=100, hcr = 0.9)
+check_result_proxy_old <- sim_proxy_old(b=6000, r=0.2, r_s=-0.00967, r_p_s = -0.00367, error=0.3, p=0.2, k=10000, years=100, hcr = 0.9)
 ```
 
 ##Model Inputs List
@@ -216,18 +216,17 @@ Create the experiment input list:
 list_msy_proxy <- list(
   b = c(1500, 4000, 6000),
   r = seq(0.1, .8, .1),
-  r_s = seq(-0.01767, 0.01623, 0.002),
-  r_p_s = c(-0.00367, -0.00567),
-  error = 0.3,
+  r_s = seq(-0.01767, 0, 0.002),
+  r_p_s = c(0, -0.00167, -0.00367, -0.00567),
+  error = 0.5,
   p = 0.2,
   k = 10000,
   years = 100,
-  hcr = seq(0.95, 0.50, -0.05)
+  hcr = seq(0.9, 0.50, -0.1)
 )
 
 input_msy_proxy <- list_msy_proxy %>%
   cross()
-
 
 ```
 
@@ -240,8 +239,8 @@ results = list()
 
 #Run the model over the input lists:
 
-for(i in 1:2448){
-  results[[i]] <- sim_msy_proxy(b=input_msy_proxy[[i]]$b, r=input_msy_proxy[[i]]$r,
+for(i in 1:4320){
+  results[[i]] <- sim_proxy_old(b=input_msy_proxy[[i]]$b, r=input_msy_proxy[[i]]$r,
                              r_s=input_msy_proxy[[i]]$r_s, r_p_s=input_msy_proxy[[i]]$r_p_s, p=input_msy_proxy[[i]]$p,
                              k=input_msy_proxy[[i]]$k, years=input_msy_proxy[[i]]$years, 
                              error = input_msy_proxy[[i]]$error, hcr = input_msy_proxy[[i]]$hcr)
@@ -260,7 +259,7 @@ col_names <- c("b", "c", "year", "r", "r_p", "f", "f_msy", "f_msy_p", "f_ratio",
 results_id <- list()
 
 #Loop to add ids to each experiment in the list - make sure the 1:xxx matches the number of lists in the results
-for(i in 1:4080){
+for(i in 1:4320){
   dat <- as.data.frame(matrix(unlist(results[i]), ncol = 11))
   dat$id <- i
   dat$r_0 <- rep(input_msy_proxy[[i]]$r, 100)
@@ -272,15 +271,15 @@ for(i in 1:4080){
   results_id[[i]] <- dat
 }
 #Bind all the experiments together
-results_noclose <- bind_rows(results_id)
+results_proxy <- bind_rows(results_id)
 
 #Update the column names:
-colnames(results_noclose) <- col_names
+colnames(results_proxy) <- col_names
 
 #Write as CSV:
 #Naming convention for files errorlevel_assessmentinterval_overhcr(%)
 library(here)
-write.csv(results_noclose, file=file.path(here(),"/Results/no_closure/miderror/miderr_1_80.csv"),
+write.csv(results_proxy, file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr1.csv"),
            row.names = FALSE)
 
 ```

@@ -1,13 +1,17 @@
 ---
-title: "hcr_no_close"
+title: "hcr_publics_viz"
 author: "Sara Orofino"
 date: "4/7/2020"
 output: html_document
 ---
 
-I want to replicate the graphs used in faculty reviews for HCRs but instead use the new combined data where instead of closing the fishery if it is over the limit, catch is reduced by 95%.  
+I'm creating three graphs for the public presentation:
 
-## Packages/Data 
+ - Graph 1: Just the individual test result with constant productivity using the proportion of healthy fisheries as y axis  
+ - Graph 2: Compare the results of prop healthy for constant vs. updating productivity (but I'll change the labels)  
+ - Graph 3: Compare prop healthy for constant, updating, and proxy results  
+
+## Packages
 
 ```{r packages-data, warning=FALSE, message=FALSE}
 library(tidyverse)
@@ -16,8 +20,13 @@ library(here)
 hcr_c <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all_c.csv"))
 ```
 
+## Data Constant Fmsy:
+```{r data-c, warning=FALSE, message=FALSE}
+hcr_c <- read_csv(file = file.path(here(), "/Presentation/discussion/alldata_combined.csv"))
+```
 
-## Wrangle
+
+## Wrangle Constant: 
 ```{r wrangle}
 ##Wrangling with the combined data set:
 hcr_c[is.na(hcr_c)] <- "misc" #turn status NA into misc
@@ -27,13 +36,13 @@ hcr_props_c <- hcr_c %>%
   group_by(hcr) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
-  mutate(simulations = sum(over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good + misc)) %>% 
   mutate(prop_good = good / simulations)
 ```
 
-## Graph Constant FMSY:
+## Graph 1: Constant FMSY:
 ```{r graph-constant}
-hcr_c <- ggplot(hcr_props_c, aes(x = hcr, y = prop_good)) +
+hcr_c_graph <- ggplot(hcr_props_c, aes(x = hcr, y = prop_good)) +
   geom_col(alpha = 0.7, fill = "#079EDF") + 
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
@@ -43,29 +52,44 @@ hcr_c <- ggplot(hcr_props_c, aes(x = hcr, y = prop_good)) +
     legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
     legend.box.background = element_blank()) 
 
-hcr_c
+hcr_c_graph
 
-# ggsave(hcr_c, filename = "hcr_c_noclose.png",  bg = "transparent",
+# ggsave(hcr_c_graph, filename = "hcr_c.png",  bg = "transparent",
 #       width = 6, height = 4)
 ```
 
-## New Updating Data (no closure)  
+## Updating Data 
 
 ```{r read-updating, warning=FALSE, message=FALSE}
-hcr_u <- read_csv(file=file.path(here(), "/analysis/no_closure/all_data/noclose_all_u.csv"))
+hcr_rep5u <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_updatingfmsy_5rep_lowerror.csv"))
+hcr_rep10u <- read_csv(file=file.path(here(),"/Results/hcrs/hcrs_updatingfmsy_10rep_lowerror.csv"))
 ```
 
 ## Wrangle Updating
 ```{r wrangle}
-##Wrangling with the combined data set:
-hcr_u[is.na(hcr_u)] <- "misc" #turn status NA into misc
+## Wrangling data:
+rep5u <- hcr_rep5u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
 
-# Calculate proportions for graphing:
-hcr_props_u <- hcr_u %>% 
+rep5u[is.na(rep5u)] <- "misc" #change status=Na to misc
+
+  
+rep10u <- hcr_rep10u %>% 
+  filter(year == 100) %>% 
+  mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
+  mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
+
+rep10u[is.na(rep10u)] <- "misc" #change status=Na to misc
+
+## Combine and calculate proportions:
+hcr_props_u <- rbind(rep5u, rep10u) %>% 
   group_by(hcr) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
-  mutate(simulations = sum(over + good + misc)) %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(simulations = sum(closed + over + good + misc)) %>% 
   mutate(prop_good = good / simulations)
 ```
 
@@ -83,11 +107,11 @@ graph_both <- rbind(graph_c, graph_u)
 ```
 
 
-## Graph Constant vs. Updating
+## Graph 2: Constant vs. Updating
 ```{r graph-both}
 hcr_both <- ggplot(graph_both, aes(x = hcr, y = prop_good, fill = productivity)) +
   geom_col(position = "dodge", alpha = 0.7) + 
-  scale_fill_manual(values = c("#079EDF", "#BC6435"), name = "Climate Response", labels = c("None", "Perfect"))+
+  scale_fill_manual(values = c("#079EDF", "#BC6435"), name = "Climate Response", labels = c("None", "Ideal"))+
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
   scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
@@ -98,6 +122,18 @@ hcr_both <- ggplot(graph_both, aes(x = hcr, y = prop_good, fill = productivity))
 
 hcr_both
 
-# ggsave(hcr_both, filename = "hcr_both_noclose.png",  bg = "transparent",
+# ggsave(hcr_both, filename = "hcr_ideal.png",  bg = "transparent",
 #       width = 6, height = 4)
 ```
+
+
+## Proxy Data:
+
+
+## Wrangle Proxy:
+
+
+## Graphing Data: 
+
+
+## Graph 3 - Constant vs. Updating vs. Proxy  

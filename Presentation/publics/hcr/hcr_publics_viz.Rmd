@@ -43,7 +43,7 @@ hcr_props_c <- hcr_c %>%
 ## Graph 1: Constant FMSY:
 ```{r graph-constant}
 hcr_c_graph <- ggplot(hcr_props_c, aes(x = hcr, y = prop_good)) +
-  geom_col(alpha = 0.7, fill = "#BC6435") + 
+  geom_col(alpha = 0.8, fill = "#BC6435") + 
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
   scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
@@ -110,7 +110,7 @@ graph_both <- rbind(graph_c, graph_u)
 ## Graph 2: Constant vs. Updating
 ```{r graph-both}
 hcr_both <- ggplot(graph_both, aes(x = hcr, y = prop_good, fill = productivity)) +
-  geom_col(position = "dodge", alpha = 0.7) + 
+  geom_col(position = "dodge", alpha = 0.8) + 
   scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Response", labels = c("None", "Ideal"))+
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +

@@ -44,6 +44,7 @@ noclim_count <- noclim_100 %>%
 clim_100 <- realistic %>% 
   filter(year == 100) %>% 
   filter(hcr == 0.70) %>% 
+  filter(r_s < 0) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
 
@@ -54,8 +55,9 @@ clim_count <- clim_100 %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(good + over + misc)) %>% 
+  mutate(simulations = sum(good + over)) %>% 
   mutate(prop_good = good / simulations) 
+
 ```
 
 ## Graphing Data:

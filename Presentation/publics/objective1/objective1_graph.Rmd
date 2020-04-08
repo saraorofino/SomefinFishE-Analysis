@@ -28,7 +28,7 @@ Use 30% HCR
 ## No climate change data:
 noclim_100 <- noclim %>% 
   filter(year == 100) %>% 
-  filter(hcr == 0.70) %>% 
+  filter(hcr == 0.85) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
 
@@ -37,13 +37,13 @@ noclim_count <- noclim_100 %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(good)) %>% 
+  mutate(simulations = sum(good + closed)) %>% 
   mutate(prop_good = good / simulations)
 
 ## Climate Change data:  
 clim_100 <- realistic %>% 
   filter(year == 100) %>% 
-  filter(hcr == 0.70) %>% 
+  filter(hcr == 0.85) %>% 
   filter(r_s < 0) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))

@@ -43,7 +43,7 @@ hcr_props_c <- hcr_c %>%
 ## Graph 1: Constant FMSY:
 ```{r graph-constant}
 hcr_c_graph <- ggplot(hcr_props_c, aes(x = hcr, y = prop_good)) +
-  geom_col(alpha = 0.7, fill = "#079EDF") + 
+  geom_col(alpha = 0.7, fill = "#BC6435") + 
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
   scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
@@ -111,7 +111,7 @@ graph_both <- rbind(graph_c, graph_u)
 ```{r graph-both}
 hcr_both <- ggplot(graph_both, aes(x = hcr, y = prop_good, fill = productivity)) +
   geom_col(position = "dodge", alpha = 0.7) + 
-  scale_fill_manual(values = c("#079EDF", "#BC6435"), name = "Climate Response", labels = c("None", "Ideal"))+
+  scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Response", labels = c("None", "Ideal"))+
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
   scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
@@ -137,3 +137,7 @@ hcr_both
 
 
 ## Graph 3 - Constant vs. Updating vs. Proxy  
+Colors:  
+ - For the original no climate response use: "#BC6435"  
+ - For the ideal climate response use:  "#079EDF"   
+ - For proxy results (precautionary) try: "#B8CE55" (but this might not look great - we aren't sure)  

@@ -142,7 +142,7 @@ proxy_old_all <- rbind(proxy_old_lowerr0, proxy_old_lowerr1, proxy_old_lowerr10,
 
 proxy_new_all_props <- proxy_new_all %>%
   #filter(r_s >= -0.01367) %>% 
-  group_by(error, r_p_s) %>% 
+  group_by(r_p_s) %>% 
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 

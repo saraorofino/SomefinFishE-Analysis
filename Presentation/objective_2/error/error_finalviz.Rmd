@@ -191,7 +191,7 @@ prop_bad100_c <- ggplot(prop_100_c, aes(x = error, y = prop_bad)) +
   geom_text(aes(label = round(prop_bad, digits = 2)), position = position_stack(vjust = 0.75), size = 7)
 prop_bad100_c
 
-#ggsave(prop_bad100_c, filename = "error.png",  bg = "transparent")
+ggsave(prop_bad100_c, filename = "error.png",  bg = "transparent")
 
 
 ##Try the other graph with the fill by type:
@@ -208,7 +208,7 @@ prop_graph <- ggplot(graph_c, aes(x= fct_rev(error), y=prop)) +
     legend.box.background = element_blank()) 
 
 prop_graph
-#ggsave(prop_graph, filename = "error_2.3.20.png",  bg = "transparent")
+ggsave(prop_graph, filename = "error_2.3.20.png",  bg = "transparent")
 
 ```
 

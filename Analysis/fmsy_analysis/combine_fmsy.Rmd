@@ -148,7 +148,7 @@ fmsy_u_all <- rbind(low_1_100, mid_1_100, high_1_100, low_5_100, mid_5_100, high
 ## Save CSV
 ```{r save}
 library(here)
-write.csv(fmsy_u_all, file=file.path(here(),"/Analysis/fmsy_analysis/fmsy_u_all_c.csv"),
+write.csv(fmsy_u_all, file=file.path(here(),"/Analysis/fmsy_analysis/fmsy_u_all.csv"),
           row.names = FALSE)
 ```
 

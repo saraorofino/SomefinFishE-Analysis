@@ -66,6 +66,8 @@ err_c_graph
 ```{r read-updating, warning=FALSE, message=FALSE}
 err_rep5u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep5_hcr30.csv"))
 err_rep10u <- read_csv(file=file.path(here(),"/Results/error/error_updating_rep10_hcr30.csv"))
+
+err_u_all <- read_csv(file=file.path(here(), "/Analysis/fmsy_analysis/fmsy_u_all.csv"))
 ```
 
 ## Wrangle Updating
@@ -89,6 +91,23 @@ err_props_u <- err_u %>%
 #Want to have error as a factor so that the graphs have a discrete x-axis:
 err_props_u$error <- as.factor(err_props_u$error)
 ```
+
+```{r wrangle-new-data}
+err_u_all[is.na(err_u_all)] <- "misc" #turn status NA into misc
+
+# Calculate proportions for graphing:
+err_props_u_all <- err_u_all %>% 
+  group_by(error) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(prop_good = good / simulations)
+
+#Want to have error as a factor so that the graphs have a discrete x-axis:
+err_props_u_all$error <- as.factor(err_props_u_all$error)
+```
+
+
 
 ## Create Graphing Data - both
 

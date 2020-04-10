@@ -89,9 +89,9 @@ ai_props_u <- ai_u %>%
 ```{r wrangle-graph-data, include=FALSE}
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_props_c$assess_int, productivity = rep("constant", 5),
+graph_c <- data.frame(assessment_interval = ai_props_c$assess_int, response = rep("none", 5),
                       prop_good = ai_props_c$prop_good)
-graph_u <- data.frame(assessment_interval = ai_props_u$assess_int, productivity = rep("updating", 5),
+graph_u <- data.frame(assessment_interval = ai_props_u$assess_int, response = rep("ideal", 5),
                       prop_good = ai_props_u$prop_good)
 graph_both <- rbind(graph_c, graph_u)
 
@@ -100,7 +100,7 @@ graph_both <- rbind(graph_c, graph_u)
 
 ## Graph 2: Constant vs. Updating
 ```{r graph-both}
-ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_good, fill = productivity)) +
+ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
   scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Response", labels = c("None", "Ideal"))+
   theme_light()+
@@ -123,6 +123,15 @@ ai_both
 
 
 ## Graphing Data: 
+```{r graph3-data}
+##Create the all graph data frame - start with constant and add updating then merge:
+graph_c <- data.frame(error = err_props_c$error, response = rep("none", 5),
+                      prop_good = err_props_c$prop_good)
+graph_u <- data.frame(error = err_props_u$error, response = rep("ideal", 5),
+                      prop_good = err_props_u$prop_good)
+graph_pre 
+graph_both <- rbind(graph_c, graph_u, graph_pre)
+```
 
 
 ## Graph 3 - Constant vs. Updating vs. Proxy  

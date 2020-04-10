@@ -87,12 +87,12 @@ err_props_u$error <- as.factor(err_props_u$error)
 
 ## Create Graphing Data - both
 
-```{r wrangle-graph-data, include=FALSE}
+```{r graph2-data, include=FALSE}
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(error = err_props_c$error, productivity = rep("constant", 3),
+graph_c <- data.frame(error = err_props_c$error, response = rep("none", 3),
                       prop_good = err_props_c$prop_good)
-graph_u <- data.frame(error = err_props_u$error, productivity = rep("updating", 3),
+graph_u <- data.frame(error = err_props_u$error, response = rep("ideal", 3),
                       prop_good = err_props_u$prop_good)
 graph_both <- rbind(graph_c, graph_u)
 
@@ -101,7 +101,7 @@ graph_both <- rbind(graph_c, graph_u)
 
 ## Graph 2: Constant vs. Updating
 ```{r graph-both}
-err_both <- ggplot(graph_both, aes(x = fct_rev(error), y = prop_good, fill = productivity)) +
+err_both <- ggplot(graph_both, aes(x = fct_rev(error), y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
   scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Response", labels = c("None", "Ideal"))+
   theme_light()+
@@ -127,6 +127,15 @@ err_both
 
 
 ## Graphing Data: 
+```{r graph3-data}
+##Create the all graph data frame - start with constant and add updating then merge:
+graph_c <- data.frame(error = err_props_c$error, response = rep("none", 3),
+                      prop_good = err_props_c$prop_good)
+graph_u <- data.frame(error = err_props_u$error, response = rep("ideal", 3),
+                      prop_good = err_props_u$prop_good)
+graph_pre 
+graph_both <- rbind(graph_c, graph_u, graph_pre)
+```
 
 
 ## Graph 3 - Constant vs. Updating vs. Proxy  

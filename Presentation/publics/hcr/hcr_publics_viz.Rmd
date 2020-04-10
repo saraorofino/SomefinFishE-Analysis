@@ -113,20 +113,39 @@ hcr_both
 
 
 ## Proxy Data:
-
+```{r proxy-data, warning=FALSE, message=FALSE}
+hcr_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/proxy_old_all_publics.csv"))
+```
+NOTE: this data is missing the 0.95 hcr  
 
 ## Wrangle Proxy:
-Note, I filtered out error = 0.5 for the two graphs above.  
+Note, I filtered out error = 0.5 for the two graphs above. 
+```{r wrangle-proxy}
+hcr_p[is.na(hcr_p)] <- "misc" #change status=Na to misc 
+
+## Combine and calculate proportions:
+hcr_props_p <- hcr_p %>% 
+  filter(error != 0.5) %>% 
+  filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
+  group_by(hcr) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(prop_good = good / simulations)
+```
+
 
 ## Graphing Data: 
 ```{r graph3-data}
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(error = err_props_c$error, response = rep("none", 10),
-                      prop_good = err_props_c$prop_good)
-graph_u <- data.frame(error = err_props_u$error, response = rep("ideal", 10),
-                      prop_good = err_props_u$prop_good)
-graph_pre 
-graph_both <- rbind(graph_c, graph_u, graph_pre)
+graph_c <- data.frame(hcr = hcr_props_c$hcr, response = rep("none", 10),
+                      prop_good = hcr_props_c$prop_good)
+graph_u <- data.frame(hcr = hcr_props_u_all$hcr, response = rep("ideal", 10),
+                      prop_good = hcr_props_u_all$prop_good)
+graph_pre <- data.frame(hcr = hcr_props_p$hcr, response = rep("precautionary", 9),
+                        prop_good = hcr_props_p$prop_good) 
+graph_all <- rbind(graph_c, graph_u, graph_pre)
 ```
 
 
@@ -135,4 +154,19 @@ Colors:
  - For the original no climate response use: "#BC6435"  
  - For the ideal climate response use:  "#079EDF"   
  - For proxy results (precautionary) try: "#B8CE55" (but this might not look great - we aren't sure) 
+
+```{r graph3-all}
+hcr_all <- ggplot(graph_all, aes(x = hcr, y = prop_good, fill = response)) +
+  geom_col(position = "dodge", alpha = 0.8) + 
+  scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Response", labels = c("None", "Ideal", "Precautionary")) +
+  theme_light()+
+  coord_cartesian( ylim=c(0,1), expand = FALSE ) +
+  scale_x_reverse(labels=c("0.5" = "50%","0.6" = "40%" ,"0.7" = "30%","0.8" = "20%","0.9" = "10%","1.0" = "0%")) +
+  labs(title = "Fishing Reduction", x = "Reduction Amount (%)", y = "Proportion Healthy")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) 
+
+hcr_all
+```
 

@@ -117,19 +117,38 @@ ai_both
 ```
 
 ## Proxy Data:
+```{r proxy-data, warning=FALSE, message=FALSE}
+ai_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/proxy_new_all_publics.csv"))
+```
 
 
 ## Wrangle Proxy:
+```{r wrangle-proxy}
+ai_intervals <- c(20,15,10,5,1) #new intervals in correct order
+
+ai_p[is.na(ai_p)] <- "misc" #turn status NA into misc
+
+# Calculate proportions for graphing:
+ai_props_p <- ai_p %>% 
+  mutate(assess_int = factor(ai, levels = ai_intervals)) %>%
+  filter(ai != 0) %>% 
+  group_by(assess_int) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(simulations = sum(over + good + misc)) %>% 
+  mutate(prop_good = good / simulations)
+```
 
 
 ## Graphing Data: 
 ```{r graph3-data}
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(error = err_props_c$error, response = rep("none", 5),
-                      prop_good = err_props_c$prop_good)
-graph_u <- data.frame(error = err_props_u$error, response = rep("ideal", 5),
-                      prop_good = err_props_u$prop_good)
-graph_pre 
+graph_c <- data.frame(assessment_interval = ai_props_c$assess_int, response = rep("none", 5),
+                      prop_good = ai_props_c$prop_good)
+graph_u <- data.frame(assessment_interval = ai_props_u$assess_int, response = rep("ideal", 5),
+                      prop_good = ai_props_u$prop_good)
+graph_pre <- data.frame(assessment_interval = ai_props_p$assess_int, response = rep("precautionary", 5),
+                        prop_good = ai_props_p$prop_good)
 graph_both <- rbind(graph_c, graph_u, graph_pre)
 ```
 
@@ -139,3 +158,21 @@ Colors:
  - For the original no climate response use: "#BC6435"  
  - For the ideal climate response use:  "#079EDF"   
  - For proxy results (precautionary) try: "#B8CE55" (but this might not look great - we aren't sure)  
+ 
+ 
+```{r graph3-all}
+
+ai_all <- ggplot(graph_both, aes(x = assessment_interval, y = prop_good, fill = response)) +
+  geom_col(position = "dodge", alpha = 0.8) + 
+  scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Response", labels = c("None", "Ideal", "Precautionary"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,1), expand = FALSE ) +
+  labs(title = "Assessment Intervals", x = "Frequency of Assessment (Years)", y = "Proportion Healthy")+
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank()) 
+
+ai_all
+
+```
+

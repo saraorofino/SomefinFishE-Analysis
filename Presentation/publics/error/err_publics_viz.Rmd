@@ -121,9 +121,27 @@ err_both
 
 
 ## Proxy Data:
+```{r proxy-data, warning=FALSE, message=FALSE}
+err_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/proxy_old_all_publics.csv"))
+```
 
 
 ## Wrangle Proxy:
+```{r wrangle-proxy}
+err_p[is.na(err_p)] <- "misc" #turn status NA into misc
+
+# Calculate proportions for graphing:
+err_props_p <- err_p %>% 
+  filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
+  group_by(error) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(prop_good = good / simulations)
+
+#Want to have error as a factor so that the graphs have a discrete x-axis:
+err_props_p$error <- as.factor(err_props_p$error)
+```
 
 
 ## Graphing Data: 
@@ -133,8 +151,9 @@ graph_c <- data.frame(error = err_props_c$error, response = rep("none", 3),
                       prop_good = err_props_c$prop_good)
 graph_u <- data.frame(error = err_props_u$error, response = rep("ideal", 3),
                       prop_good = err_props_u$prop_good)
-graph_pre 
-graph_both <- rbind(graph_c, graph_u, graph_pre)
+graph_pre <- data.frame(error = err_props_p$error, response = rep("precautionary", 3),
+                        prop_good = err_props_p$prop_good)
+graph_all <- rbind(graph_c, graph_u, graph_pre)
 ```
 
 
@@ -143,7 +162,23 @@ Colors:
  - For the original no climate response use: "#BC6435"  
  - For the ideal climate response use:  "#079EDF"   
  - For proxy results (precautionary) try: "#B8CE55" (but this might not look great - we aren't sure)  
- 
+
+```{r graph3-all}
+err_both <- ggplot(graph_all, aes(x = fct_rev(error), y = prop_good, fill = response)) +
+  geom_col(position = "dodge", alpha = 0.8) + 
+  scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Response", labels = c("None", "Ideal", "Precautionary"))+
+  theme_light()+
+  coord_cartesian( ylim=c(0,1), expand = FALSE ) +
+  labs(title = "Estimates", x = "Accuracy of Estimates", y = "Proportion Healthy") +
+  scale_x_discrete(labels=c("0.5" = "Low", "0.3" = "Moderate",
+                              "0.1" = "High")) +
+  theme(axis.text.x=element_text(size=15), axis.text.y=element_text(size=15), plot.title = element_text(hjust = 0.5, face = "bold", size = 20), axis.title.x = element_text(face = "bold", size = 15), axis.title.y = element_text(face = "bold", size = 15), legend.title.align=0.5, panel.background = element_rect(fill = "transparent",colour = NA), plot.background = element_rect(fill = "transparent",colour = NA), legend.title=element_text(size=15), 
+    legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
+    legend.box.background = element_blank())  
+
+err_both
+```
+
 
 
 

@@ -25,16 +25,14 @@ err_c <- read_csv(file = file.path(here(), "/Presentation/discussion/alldata_com
 
 ## Wrangle Constant: 
 ```{r wrangle-c}
-##Wrangling with the combined data set:
-err_c[is.na(err_c)] <- "misc" #turn status NA into misc
-
 # Calculate proportions for graphing:
 err_props_c <- err_c %>% 
+  filter(r_s < 0) %>% 
   group_by(error) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_good = good / simulations)
 
 #Want to have error as a factor so that the graphs have a discrete x-axis:
@@ -69,14 +67,13 @@ err_u <- read_csv(file=file.path(here(), "/Analysis/fmsy_analysis/fmsy_u_all.csv
 
 ## Wrangle Updating
 ```{r wrangle-updating}
-err_u[is.na(err_u)] <- "misc" #turn status NA into misc
-
 # Calculate proportions for graphing:
-err_props_u <- err_u %>% 
+err_props_u <- err_u %>%
+  filter(r_s < 0) %>% 
   group_by(error) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_good = good / simulations)
 
 #Want to have error as a factor so that the graphs have a discrete x-axis:
@@ -128,15 +125,14 @@ err_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics
 
 ## Wrangle Proxy:
 ```{r wrangle-proxy}
-err_p[is.na(err_p)] <- "misc" #turn status NA into misc
-
 # Calculate proportions for graphing:
 err_props_p <- err_p %>% 
   filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
+  filter(r_s < 0) %>% 
   group_by(error) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_good = good / simulations)
 
 #Want to have error as a factor so that the graphs have a discrete x-axis:
@@ -164,7 +160,7 @@ Colors:
  - For proxy results (precautionary) try: "#B8CE55" (but this might not look great - we aren't sure)  
 
 ```{r graph3-all}
-err_both <- ggplot(graph_all, aes(x = fct_rev(error), y = prop_good, fill = response)) +
+err_all <- ggplot(graph_all, aes(x = fct_rev(error), y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
   scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Response", labels = c("None", "Ideal", "Precautionary"))+
   theme_light()+
@@ -176,7 +172,9 @@ err_both <- ggplot(graph_all, aes(x = fct_rev(error), y = prop_good, fill = resp
     legend.text=element_text(size=12),legend.key = element_rect(fill = "transparent", colour = "transparent"), legend.background = element_blank(),
     legend.box.background = element_blank())  
 
-err_both
+err_all
+# ggsave(err_all, filename = "err_pre.png",  bg = "transparent",
+#       width = 6, height = 4)
 ```
 
 

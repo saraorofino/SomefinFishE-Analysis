@@ -5,7 +5,7 @@ date: "4/9/2020"
 output: html_document
 ---
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 library(tidyverse)
 library(here)
 
@@ -123,15 +123,54 @@ proxy_new_lowerr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy
   filter(year == 100) %>% 
   mutate(ai = "1")
 
+### Adding the new hcr 0.95 results for old model:
+proxy_old_0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/hcr_0.95_allerr/proxy_old_0.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "0")
+proxy_old_20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/hcr_0.95_allerr/proxy_old_20.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "20")
+proxy_old_15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/hcr_0.95_allerr/proxy_old_15.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "15")
+proxy_old_10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/hcr_0.95_allerr/proxy_old_10.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "10")
+proxy_old_5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/hcr_0.95_allerr/proxy_old_5.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "5")
+proxy_old_1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/hcr_0.95_allerr/proxy_old_1.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "1")
+
+### Adding new hcr 0.95 results for new model:
+proxy_new_0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/hcr_0.95_allerr/proxy_new_0.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "0")
+proxy_new_20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/hcr_0.95_allerr/proxy_new_20.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "20")
+proxy_new_15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/hcr_0.95_allerr/proxy_new_15.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "15")
+proxy_new_10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/hcr_0.95_allerr/proxy_new_10.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "10")
+proxy_new_5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/hcr_0.95_allerr/proxy_new_5.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "5")
+proxy_new_1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/hcr_0.95_allerr/proxy_new_1.csv")) %>% 
+  filter(year == 100) %>% 
+  mutate(ai = "1")
 ```
 
 ```{r}
 
-proxy_new_all_publics <- rbind(proxy_new_lowerr0, proxy_new_lowerr1, proxy_new_lowerr10, proxy_new_lowerr15, proxy_new_lowerr20, proxy_new_lowerr5, proxy_new_miderr0, proxy_new_miderr1, proxy_new_miderr10, proxy_new_miderr15, proxy_new_miderr20, proxy_new_miderr5, proxy_new_higherr0, proxy_new_higherr1, proxy_new_higherr10, proxy_new_higherr15, proxy_new_higherr20, proxy_new_higherr5) %>% 
+proxy_new_all_publics <- rbind(proxy_new_lowerr0, proxy_new_lowerr1, proxy_new_lowerr10, proxy_new_lowerr15, proxy_new_lowerr20, proxy_new_lowerr5, proxy_new_miderr0, proxy_new_miderr1, proxy_new_miderr10, proxy_new_miderr15, proxy_new_miderr20, proxy_new_miderr5, proxy_new_higherr0, proxy_new_higherr1, proxy_new_higherr10, proxy_new_higherr15, proxy_new_higherr20, proxy_new_higherr5, proxy_new_0, proxy_new_1, proxy_new_5, proxy_new_10, proxy_new_15, proxy_new_20) %>% 
   mutate(status = ifelse(b <= 1000, "over", "good")) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
 
-proxy_old_all_publics <- rbind(proxy_old_lowerr0, proxy_old_lowerr1, proxy_old_lowerr10, proxy_old_lowerr15, proxy_old_lowerr20, proxy_old_lowerr5, proxy_old_miderr0, proxy_old_miderr1, proxy_old_miderr10, proxy_old_miderr15, proxy_old_miderr20, proxy_old_miderr5, proxy_old_higherr0, proxy_old_higherr1, proxy_old_higherr10, proxy_old_higherr15, proxy_old_higherr20, proxy_old_higherr5) %>% 
+proxy_old_all_publics <- rbind(proxy_old_lowerr0, proxy_old_lowerr1, proxy_old_lowerr10, proxy_old_lowerr15, proxy_old_lowerr20, proxy_old_lowerr5, proxy_old_miderr0, proxy_old_miderr1, proxy_old_miderr10, proxy_old_miderr15, proxy_old_miderr20, proxy_old_miderr5, proxy_old_higherr0, proxy_old_higherr1, proxy_old_higherr10, proxy_old_higherr15, proxy_old_higherr20, proxy_old_higherr5, proxy_old_0, proxy_old_1, proxy_old_5, proxy_old_10, proxy_old_15, proxy_old_20) %>% 
   mutate(status = ifelse(f_ratio == 0, "closed", ifelse(b <= 1000, "over", "good"))) %>% 
   mutate(growth = ifelse(r_0 <= .3, "slow", ifelse(r_0 > .3 & r_0 <= .5, "medium", "fast")))
 

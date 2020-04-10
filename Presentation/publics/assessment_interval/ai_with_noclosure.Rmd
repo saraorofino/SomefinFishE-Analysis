@@ -37,9 +37,11 @@ ai_c[is.na(ai_c)] <- "misc" #turn status NA into misc
 # Calculate proportions for graphing:
 ai_props_c <- ai_c %>% 
   mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
+  filter(r_s < 0) %>% 
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(simulations = sum(over + good + misc)) %>% 
   mutate(prop_good = good / simulations)
 ```
@@ -77,9 +79,11 @@ ai_u[is.na(ai_u)] <- "misc" #turn status NA into misc
 # Calculate proportions for graphing:
 ai_props_u <- ai_u %>% 
   mutate(assess_int = factor(assess, levels = ai_intervals)) %>%
+  filter(r_s < 0) %>% 
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(simulations = sum(over + good + misc)) %>% 
   mutate(prop_good = good / simulations)
 ```
@@ -132,9 +136,11 @@ ai_p[is.na(ai_p)] <- "misc" #turn status NA into misc
 ai_props_p <- ai_p %>% 
   mutate(assess_int = factor(ai, levels = ai_intervals)) %>%
   filter(ai != 0) %>% 
+  filter(r_s < 0) %>% 
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
   mutate(simulations = sum(over + good + misc)) %>% 
   mutate(prop_good = good / simulations)
 ```
@@ -173,6 +179,7 @@ ai_all <- ggplot(graph_both, aes(x = assessment_interval, y = prop_good, fill = 
     legend.box.background = element_blank()) 
 
 ai_all
-
+# ggsave(ai_all, filename = "ai_pre_noclose.png",  bg = "transparent",
+#       width = 6, height = 4)
 ```
 

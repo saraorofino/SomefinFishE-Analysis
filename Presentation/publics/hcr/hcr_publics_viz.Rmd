@@ -26,16 +26,14 @@ hcr_c <- read_csv(file = file.path(here(), "/Presentation/discussion/alldata_com
 
 ## Wrangle Constant: 
 ```{r wrangle}
-##Wrangling with the combined data set:
-hcr_c[is.na(hcr_c)] <- "misc" #turn status NA into misc
-
-# Calculate proportions for graphing:
+## Calculate proportions for graphing:
 hcr_props_c <- hcr_c %>% 
   filter(error != 0.5) %>% 
+  filter(r_s < 0) %>% 
   group_by(hcr) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_good = good / simulations)
 ```
 
@@ -65,16 +63,15 @@ hcr_u <- read_csv(file=file.path(here(), "/Analysis/fmsy_analysis/fmsy_u_all.csv
 
 ## Wrangle Updating
 ```{r wrangle-u}
-hcr_u[is.na(hcr_u)] <- "misc" #change status=Na to misc
-
 ## Combine and calculate proportions:
 hcr_props_u_all <- hcr_u %>% 
   filter(error != 0.5) %>% 
+  filter(r_s < 0) %>% 
   group_by(hcr) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_good = good / simulations)
 ```
 
@@ -121,17 +118,16 @@ NOTE: this data is missing the 0.95 hcr
 ## Wrangle Proxy:
 Note, I filtered out error = 0.5 for the two graphs above. 
 ```{r wrangle-proxy}
-hcr_p[is.na(hcr_p)] <- "misc" #change status=Na to misc 
-
 ## Combine and calculate proportions:
 hcr_props_p <- hcr_p %>% 
   filter(error != 0.5) %>% 
   filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
+  filter(r_s < 0) %>% 
   group_by(hcr) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
   mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
-  mutate(simulations = sum(closed + over + good + misc)) %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
   mutate(prop_good = good / simulations)
 ```
 
@@ -143,7 +139,7 @@ graph_c <- data.frame(hcr = hcr_props_c$hcr, response = rep("none", 10),
                       prop_good = hcr_props_c$prop_good)
 graph_u <- data.frame(hcr = hcr_props_u_all$hcr, response = rep("ideal", 10),
                       prop_good = hcr_props_u_all$prop_good)
-graph_pre <- data.frame(hcr = hcr_props_p$hcr, response = rep("precautionary", 9),
+graph_pre <- data.frame(hcr = hcr_props_p$hcr, response = rep("precautionary", 10),
                         prop_good = hcr_props_p$prop_good) 
 graph_all <- rbind(graph_c, graph_u, graph_pre)
 ```
@@ -168,5 +164,7 @@ hcr_all <- ggplot(graph_all, aes(x = hcr, y = prop_good, fill = response)) +
     legend.box.background = element_blank()) 
 
 hcr_all
+# ggsave(hcr_all, filename = "hcr_pre.png",  bg = "transparent",
+#       width = 6, height = 4)
 ```
 

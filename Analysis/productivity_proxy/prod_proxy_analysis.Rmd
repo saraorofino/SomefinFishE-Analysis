@@ -9,117 +9,117 @@ output: html_document
 library(tidyverse)
 library(here)
 
-proxy_old_higherr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr0.csv")) %>% 
+proxy_old_higherr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/higherror/proxy_old_higherr0.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "0")
-proxy_old_higherr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr20.csv")) %>% 
+proxy_old_higherr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/higherror/proxy_old_higherr20.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "20")
-proxy_old_higherr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr15.csv")) %>% 
+proxy_old_higherr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/higherror/proxy_old_higherr15.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "15")
-proxy_old_higherr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr10.csv")) %>% 
+proxy_old_higherr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/higherror/proxy_old_higherr10.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "10")
-proxy_old_higherr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr5.csv")) %>% 
+proxy_old_higherr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/higherror/proxy_old_higherr5.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "5")
-proxy_old_higherr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/higherror/proxy_old_higherr1.csv")) %>% 
+proxy_old_higherr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/higherror/proxy_old_higherr1.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "1")
 
-proxy_old_miderr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/miderror/proxy_old_miderr0.csv")) %>% 
+proxy_old_miderr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/miderror/proxy_old_miderr0.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "0")
-proxy_old_miderr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/miderror/proxy_old_miderr20.csv")) %>% 
+proxy_old_miderr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/miderror/proxy_old_miderr20.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "20")
-proxy_old_miderr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/miderror/proxy_old_miderr15.csv")) %>% 
+proxy_old_miderr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/miderror/proxy_old_miderr15.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "15")
-proxy_old_miderr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/miderror/proxy_old_miderr10.csv")) %>% 
+proxy_old_miderr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/miderror/proxy_old_miderr10.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "10")
-proxy_old_miderr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/miderror/proxy_old_miderr5.csv")) %>% 
+proxy_old_miderr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/miderror/proxy_old_miderr5.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "5")
-proxy_old_miderr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/miderror/proxy_old_miderr1.csv")) %>% 
+proxy_old_miderr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/miderror/proxy_old_miderr1.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "1")
 
-proxy_old_lowerr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/lowerror/proxy_old_lowerr0.csv")) %>% 
+proxy_old_lowerr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/lowerror/proxy_old_lowerr0.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "0")
-proxy_old_lowerr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/lowerror/proxy_old_lowerr20.csv")) %>% 
+proxy_old_lowerr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/lowerror/proxy_old_lowerr20.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "20")
-proxy_old_lowerr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/lowerror/proxy_old_lowerr15.csv")) %>% 
+proxy_old_lowerr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/lowerror/proxy_old_lowerr15.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "15")
-proxy_old_lowerr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/lowerror/proxy_old_lowerr10.csv")) %>% 
+proxy_old_lowerr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/lowerror/proxy_old_lowerr10.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "10")
-proxy_old_lowerr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/lowerror/proxy_old_lowerr5.csv")) %>% 
+proxy_old_lowerr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/lowerror/proxy_old_lowerr5.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "5")
-proxy_old_lowerr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/old_model/lowerror/proxy_old_lowerr1.csv")) %>% 
+proxy_old_lowerr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/old_model/lowerror/proxy_old_lowerr1.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "1")
 
-proxy_new_higherr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/higherror/proxy_new_higherr0.csv")) %>% 
+proxy_new_higherr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/higherror/proxy_new_higherr0.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "0")
-proxy_new_higherr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/higherror/proxy_new_higherr20.csv")) %>% 
+proxy_new_higherr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/higherror/proxy_new_higherr20.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "20")
-proxy_new_higherr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/higherror/proxy_new_higherr15.csv")) %>% 
+proxy_new_higherr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/higherror/proxy_new_higherr15.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "15")
-proxy_new_higherr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/higherror/proxy_new_higherr10.csv")) %>% 
+proxy_new_higherr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/higherror/proxy_new_higherr10.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "10")
-proxy_new_higherr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/higherror/proxy_new_higherr5.csv")) %>% 
+proxy_new_higherr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/higherror/proxy_new_higherr5.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "5")
-proxy_new_higherr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/higherror/proxy_new_higherr1.csv")) %>% 
+proxy_new_higherr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/higherror/proxy_new_higherr1.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "1")
 
-proxy_new_miderr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/miderror/proxy_new_miderr0.csv")) %>% 
+proxy_new_miderr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/miderror/proxy_new_miderr0.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "0")
-proxy_new_miderr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/miderror/proxy_new_miderr20.csv")) %>% 
+proxy_new_miderr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/miderror/proxy_new_miderr20.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "20")
-proxy_new_miderr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/miderror/proxy_new_miderr15.csv")) %>% 
+proxy_new_miderr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/miderror/proxy_new_miderr15.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "15")
-proxy_new_miderr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/miderror/proxy_new_miderr10.csv")) %>% 
+proxy_new_miderr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/miderror/proxy_new_miderr10.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "10")
-proxy_new_miderr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/miderror/proxy_new_miderr5.csv")) %>% 
+proxy_new_miderr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/miderror/proxy_new_miderr5.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "5")
-proxy_new_miderr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/miderror/proxy_new_miderr1.csv")) %>% 
+proxy_new_miderr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/miderror/proxy_new_miderr1.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "1")
 
-proxy_new_lowerr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/lowerror/proxy_new_lowerr0.csv")) %>% 
+proxy_new_lowerr0 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/lowerror/proxy_new_lowerr0.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "0")
-proxy_new_lowerr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/lowerror/proxy_new_lowerr20.csv")) %>% 
+proxy_new_lowerr20 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/lowerror/proxy_new_lowerr20.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "20")
-proxy_new_lowerr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/lowerror/proxy_new_lowerr15.csv")) %>% 
+proxy_new_lowerr15 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/lowerror/proxy_new_lowerr15.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "15")
-proxy_new_lowerr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/lowerror/proxy_new_lowerr10.csv")) %>% 
+proxy_new_lowerr10 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/lowerror/proxy_new_lowerr10.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "10")
-proxy_new_lowerr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/lowerror/proxy_new_lowerr5.csv")) %>% 
+proxy_new_lowerr5 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/lowerror/proxy_new_lowerr5.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "5")
-proxy_new_lowerr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/new_model/lowerror/proxy_new_lowerr1.csv")) %>% 
+proxy_new_lowerr1 <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_analyzing/new_model/lowerror/proxy_new_lowerr1.csv")) %>% 
   filter(year == 100) %>% 
   mutate(ai = "1")
 

@@ -216,13 +216,13 @@ Create the experiment input list:
 list_msy_proxy <- list(
   b = c(1500, 4000, 6000),
   r = seq(0.1, .8, .1),
-  r_s = seq(-0.01767, 0.01623, 0.002),
-  r_p_s = -0.00567,
-  error = 0.5,
+  r_s = seq(-0.01767, 0, 0.002),
+  r_p_s = c(-0.01167, -0.01767),
+  error = 0.3,
   p = 0.2,
   k = 10000,
   years = 100,
-  hcr = seq(0.9, 0.50, -0.05)
+  hcr = seq(0.95, 0.50, -0.05)
 )
 
 input_msy_proxy <- list_msy_proxy %>%
@@ -239,7 +239,7 @@ results = list()
 
 #Run the model over the input lists:
 
-for(i in 1:3672){
+for(i in 1:4320){
   results[[i]] <- sim_proxy_old(b=input_msy_proxy[[i]]$b, r=input_msy_proxy[[i]]$r,
                              r_s=input_msy_proxy[[i]]$r_s, r_p_s=input_msy_proxy[[i]]$r_p_s, p=input_msy_proxy[[i]]$p,
                              k=input_msy_proxy[[i]]$k, years=input_msy_proxy[[i]]$years, 
@@ -259,7 +259,7 @@ col_names <- c("b", "c", "year", "r", "r_p", "f", "f_msy", "f_msy_p", "f_ratio",
 results_id <- list()
 
 #Loop to add ids to each experiment in the list - make sure the 1:xxx matches the number of lists in the results
-for(i in 1:3672){
+for(i in 1:4320){
   dat <- as.data.frame(matrix(unlist(results[i]), ncol = 11))
   dat$id <- i
   dat$r_0 <- rep(input_msy_proxy[[i]]$r, 100)
@@ -279,7 +279,7 @@ colnames(results_proxy) <- col_names
 #Write as CSV:
 #Naming convention for files errorlevel_assessmentinterval_overhcr(%)
 library(here)
-write.csv(results_proxy, file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/higherror/proxy_old_higherr1.csv"),
+write.csv(results_proxy, file=file.path(here(),"/Results/productivity_proxy/severe/old_model/miderror/proxy_old_miderr15.csv"),
            row.names = FALSE)
 
 ```

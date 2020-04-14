@@ -237,7 +237,7 @@ list_msy_proxy <- list(
   p = 0.2,
   k = 10000,
   years = 100,
-  hcr = seq(0.9, 0.50, -0.05)
+  hcr = seq(0.95, 0.50, -0.05)
 )
 
 input_msy_proxy <- list_msy_proxy %>%

@@ -218,7 +218,7 @@ list_msy_proxy <- list(
   r = seq(0.1, .8, .1),
   r_s = seq(-0.01767, 0, 0.002),
   r_p_s = c(-0.01167, -0.01767),
-  error = 0.3,
+  error = 0.1,
   p = 0.2,
   k = 10000,
   years = 100,
@@ -279,7 +279,7 @@ colnames(results_proxy) <- col_names
 #Write as CSV:
 #Naming convention for files errorlevel_assessmentinterval_overhcr(%)
 library(here)
-write.csv(results_proxy, file=file.path(here(),"/Results/productivity_proxy/severe/old_model/miderror/proxy_old_miderr15.csv"),
+write.csv(results_proxy, file=file.path(here(),"/Results/productivity_proxy/severe/old_model/lowerror/proxy_old_lowerr1.csv"),
            row.names = FALSE)
 
 ```

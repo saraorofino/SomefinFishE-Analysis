@@ -102,7 +102,7 @@ graph_both <- rbind(graph_c, graph_u)
 ```{r graph-both}
 err_both <- ggplot(graph_both, aes(x = fct_rev(error), y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
-  scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Response", labels = c("None", "Ideal"))+
+  scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Change\nAnticipation", labels = c("None", "Ideal"))+
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
   labs(title = "Estimates", x = "Accuracy of Estimates", y = "Proportion Healthy") +
@@ -166,7 +166,7 @@ Colors:
 ```{r graph3-all}
 err_all <- ggplot(graph_all, aes(x = fct_rev(error), y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
-  scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Response", labels = c("None", "Ideal", "Precautionary"))+
+  scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Change\nAnticipation", labels = c("None", "Ideal", "Precautionary"))+
   theme_light()+
   coord_cartesian( ylim=c(0,1), expand = FALSE ) +
   labs(title = "Estimates", x = "Accuracy of Estimates", y = "Proportion Healthy") +

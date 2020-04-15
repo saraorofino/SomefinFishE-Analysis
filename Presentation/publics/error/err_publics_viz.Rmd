@@ -122,17 +122,19 @@ err_both
 
 
 ## Proxy Data:
+Note 4/14: I'm going to use the middle level proxy (-0.01167) which is about 1% per year decline 
 ```{r proxy-data, warning=FALSE, message=FALSE}
-err_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/proxy_old_all_publics.csv"))
+err_p_sev <- read_csv(file=file.path(here(),"/Results/productivity_proxy/severe/old_model/proxy_old_all_severe.csv"))
 ```
 
 
 ## Wrangle Proxy:
 ```{r wrangle-proxy}
 # Calculate proportions for graphing:
-err_props_p <- err_p %>% 
+err_props_1 <- err_p_sev %>% 
   filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
   filter(r_s < 0) %>% 
+  filter(r_p_s == -0.01167) %>% 
   group_by(error) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
@@ -140,7 +142,7 @@ err_props_p <- err_p %>%
   mutate(prop_good = good / simulations)
 
 #Want to have error as a factor so that the graphs have a discrete x-axis:
-err_props_p$error <- as.factor(err_props_p$error)
+err_props_1$error <- as.factor(err_props_1$error)
 ```
 
 
@@ -151,8 +153,8 @@ graph_c_err <- data.frame(error = err_props_c$error, response = rep("none", 3),
                       prop_good = err_props_c$prop_good)
 graph_u_err <- data.frame(error = err_props_u$error, response = rep("ideal", 3),
                       prop_good = err_props_u$prop_good)
-graph_pre_err <- data.frame(error = err_props_p$error, response = rep("precautionary", 3),
-                        prop_good = err_props_p$prop_good)
+graph_pre_err <- data.frame(error = err_props_1$error, response = rep("precautionary", 3),
+                        prop_good = err_props_1$prop_good)
 graph_all_err <- rbind(graph_c_err, graph_u_err, graph_pre_err)
 ```
 
@@ -186,14 +188,26 @@ err_all
 
 ## Graph 4 Compare proxy results
 
-## Additional Proxy Data:
+## All Proxy Data:
 ```{r new-proxy-data, warning=FALSE, message=FALSE}
+err_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/old_model/proxy_old_all_publics.csv"))
 err_p_sev <- read_csv(file=file.path(here(),"/Results/productivity_proxy/severe/old_model/proxy_old_all_severe.csv"))
 ```
 
-## Wrangle Additional Proxy Data:
+## Wrangle All Proxy Data:
 ```{r wrangle-new-proxy}
-# Spearate two other estimates & calculate severe proportions for graphing:
+
+# Calculate proportions for graphing for 0.55%:
+err_props_p <- err_p %>% 
+  filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
+  filter(r_s < 0) %>% 
+  group_by(error) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate(simulations = sum(closed + over + good)) %>% 
+  mutate(prop_good = good / simulations)
+
+# Spearate two other estimates (1% and 1.5%) & calculate severe proportions for graphing:
 err_props_1 <- err_p_sev %>% 
   filter(ai != 0) %>% #filter out no repeat (none of the other data has this ai)
   filter(r_s < 0) %>% 
@@ -215,6 +229,7 @@ err_props_1.5 <- err_p_sev %>%
   mutate(prop_good = good / simulations)
 
 #Want to have error as a factor so that the graphs have a discrete x-axis:
+err_props_p$error <- as.factor(err_props_p$error)
 err_props_1$error <- as.factor(err_props_1$error)
 err_props_1.5$error <- as.factor(err_props_1.5$error)
 ```

@@ -95,18 +95,18 @@ ai_props_u <- ai_u %>%
 ```{r wrangle-graph-data, include=FALSE}
 
 ##Create the all graph data frame - start with constant and add updating then merge:
-graph_c <- data.frame(assessment_interval = ai_props_c$assess_int, response = rep("none", 5),
+graph_c_ai <- data.frame(assessment_interval = ai_props_c$assess_int, response = rep("none", 5),
                       prop_good = ai_props_c$prop_good)
-graph_u <- data.frame(assessment_interval = ai_props_u$assess_int, response = rep("ideal", 5),
+graph_u_ai <- data.frame(assessment_interval = ai_props_u$assess_int, response = rep("ideal", 5),
                       prop_good = ai_props_u$prop_good)
-graph_both <- rbind(graph_c, graph_u)
+graph_both_ai <- rbind(graph_c_ai, graph_u_ai)
 
 ```
 
 
 ## Graph 2: Constant vs. Updating
 ```{r graph-both}
-ai_both <- ggplot(graph_both, aes(x = assessment_interval, y = prop_good, fill = response)) +
+ai_both <- ggplot(graph_both_ai, aes(x = assessment_interval, y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
   scale_fill_manual(values = c("#BC6435", "#079EDF"), name = "Climate Change\nAnticipation", labels = c("None", "Ideal"))+
   theme_light()+
@@ -125,8 +125,9 @@ ai_both
 ```
 
 ## Proxy Data:
+Note 4/14: I'm going to use the middle level proxy (-0.01167) which is about 1% per year decline  
 ```{r proxy-data, warning=FALSE, message=FALSE}
-ai_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/proxy_new_all_publics.csv"))
+ai_p_sev <- read_csv(file=file.path(here(),"/Results/productivity_proxy/severe/new_model/proxy_new_all_severe.csv"))
 ```
 
 
@@ -134,13 +135,14 @@ ai_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/
 ```{r wrangle-proxy}
 ai_intervals <- c(20,15,10,5,1) #new intervals in correct order
 
-ai_p[is.na(ai_p)] <- "misc" #turn status NA into misc
+ai_p_sev[is.na(ai_p_sev)] <- "misc" #turn status NA into misc
 
 # Calculate proportions for graphing:
-ai_props_p <- ai_p %>% 
+ai_props_1 <- ai_p_sev %>% 
   mutate(assess_int = factor(ai, levels = ai_intervals)) %>%
   filter(ai != 0) %>% 
   filter(r_s < 0) %>% 
+  filter(r_p_s == -0.01167) %>% 
   group_by(assess_int) %>%
   count(status) %>% 
   spread(key = "status", value = "n") %>% 
@@ -158,9 +160,9 @@ graph_c_ai <- data.frame(assessment_interval = ai_props_c$assess_int, response =
                       prop_good = ai_props_c$prop_good)
 graph_u_ai <- data.frame(assessment_interval = ai_props_u$assess_int, response = rep("ideal", 5),
                       prop_good = ai_props_u$prop_good)
-graph_pre_ai <- data.frame(assessment_interval = ai_props_p$assess_int, response = rep("precautionary", 5),
-                        prop_good = ai_props_p$prop_good)
-graph_both_ai <- rbind(graph_c_ai, graph_u_ai, graph_pre_ai)
+graph_pre_ai <- data.frame(assessment_interval = ai_props_1$assess_int, response = rep("precautionary", 5),
+                      prop_good = ai_props_1$prop_good)
+graph_all_ai <- rbind(graph_c_ai, graph_u_ai, graph_pre_ai)
 ```
 
 
@@ -173,7 +175,7 @@ Colors:
  
 ```{r graph3-all}
 
-ai_all <- ggplot(graph_both_ai, aes(x = assessment_interval, y = prop_good, fill = response)) +
+ai_all <- ggplot(graph_all_ai, aes(x = assessment_interval, y = prop_good, fill = response)) +
   geom_col(position = "dodge", alpha = 0.8) + 
   scale_fill_manual(values = c("#BC6435", "#079EDF", "#B8CE55"), name = "Climate Change\nAnticipation", labels = c("None", "Ideal", "Precautionary"))+
   theme_light()+
@@ -192,8 +194,9 @@ ai_all
 
 ## Compare Proxies 
 
-## New Proxy Data:
+## All Proxy Data:
 ```{r new-proxy-data, warning=FALSE, message=FALSE}
+ai_p <- read_csv(file=file.path(here(),"/Results/productivity_proxy/for_publics/new_model/proxy_new_all_publics.csv"))
 ai_p_sev <- read_csv(file=file.path(here(),"/Results/productivity_proxy/severe/new_model/proxy_new_all_severe.csv"))
 ```
 
@@ -203,7 +206,21 @@ ai_intervals <- c(20,15,10,5,1) #new intervals in correct order
 
 ai_p_sev[is.na(ai_p_sev)] <- "misc"
 
-# Spearate two other estimates & calculate severe proportions for graphing:
+ai_p[is.na(ai_p)] <- "misc" #turn status NA into misc
+
+# Calculate proportions for graphing for 0.55% decline:
+ai_props_p <- ai_p %>% 
+  mutate(assess_int = factor(ai, levels = ai_intervals)) %>%
+  filter(ai != 0) %>% 
+  filter(r_s < 0) %>% 
+  group_by(assess_int) %>%
+  count(status) %>% 
+  spread(key = "status", value = "n") %>% 
+  mutate_if(is.numeric, ~replace(., is.na(.), 0)) %>% 
+  mutate(simulations = sum(over + good + misc)) %>% 
+  mutate(prop_good = good / simulations)
+
+# Spearate two other estimates (1% and 1.5%) & calculate severe proportions for graphing:
 ai_props_1 <- ai_p_sev %>% 
   mutate(assess_int = factor(ai, levels = ai_intervals)) %>%
   filter(ai != 0) %>% 

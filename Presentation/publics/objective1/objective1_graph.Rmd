@@ -72,7 +72,7 @@ graph_both <- rbind(graph_noclim, graph_clim)
 ## Graph
 ```{r graph}
 compare <- ggplot(graph_both, aes(x = climate, y = prop_good)) +
-  geom_col(alpha = 0.5, fill = "#BC6435", width = .5) + 
+  geom_col(alpha = 0.8, fill = "#DAB0A0", width = .5) + 
   theme_light()+
   coord_cartesian( ylim=c(0.05 ,1)) +
   labs(title = "FISHE Climate Comparison", x = "Climate Inclusion", y = "Proportion Healthy")+

@@ -185,6 +185,17 @@ err_all
 #       width = 6, height = 4)
 ```
 
+# Compare benefits
+Just want to quickly calculate how much better ideal is than constant and how close the proxy gets to the ideal  
+```{r calc-benefits}
+benefits_err <- data.frame(err = err_props_c$error, none = err_props_c$prop_good, ideal = err_props_u$prop_good,
+                           precautionary = err_props_1$prop_good) %>% 
+  mutate(change_ideal = ideal - none) %>% 
+  mutate(change_pre = precautionary - none) %>% 
+  mutate(prop_pre = change_pre / change_ideal)
+```
+For the 0.1 error you get 74% of the benefits from perfect climate anticipation by assuming the 1% decline  
+
 
 ## Graph 4 Compare proxy results
 

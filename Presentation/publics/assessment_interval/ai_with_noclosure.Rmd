@@ -192,6 +192,21 @@ ai_all
 #       width = 6, height = 4)
 ```
 
+
+# Compare benefits
+Just want to quickly calculate how much better ideal is than constant and how close the proxy gets to the ideal  
+```{r calc-benefits}
+benefits_ai <- data.frame(ai = ai_props_c$assessment_interval, none = ai_props_c$prop_good, ideal = ai_props_u$prop_good,
+                          precautionary = ai_props_1$prop_good) %>% 
+  mutate(change_ideal = ideal - none) %>% 
+  mutate(change_pre = precautionary - none) %>% 
+  mutate(prop_pre = change_pre / change_ideal)
+```
+Cool - looks like precautionary gets you 87-99 percent of the benefits from ideal  
+
+
+
+
 ## Compare Proxies 
 
 ## All Proxy Data:

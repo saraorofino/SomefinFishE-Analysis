@@ -175,6 +175,18 @@ hcr_all
 #       width = 6, height = 4)
 ```
 
+# Compare benefits
+Just want to quickly calculate how much better ideal is than constant and how close the proxy gets to the ideal  
+```{r calc-benefits}
+benefits_hcr <- data.frame(hcr = hcr_props_c$hcr, none = hcr_props_c$prop_good, ideal = hcr_props_u_all$prop_good,
+                           precautionary = hcr_props_1$prop_good) %>% 
+  mutate(change_ideal = ideal - none) %>% 
+  mutate(change_pre = precautionary - none) %>% 
+  mutate(prop_pre = change_pre / change_ideal)
+```
+At 5% you're losing benefits, but for those that are better than the none, benefits range from 33-70% of ideal  
+
+
 ## Graph 4 Compare proxy results
 
 ## All Proxy Data:
